@@ -1,26 +1,18 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useContext } from "react";
+import { AuthContext, AuthProvider } from "./auth/AuthProvider";
+import AppRoutes from "./routes/AppRoutes";
+import { useColorMode } from "./context/ColorModeContext";
+import AuthGate from "./auth/AuthGate";
 
-function App() {
+const App = () => {
+  const { theme } = useColorMode();
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    // <AuthProvider>
+    //   <AuthGate>
+    <AppRoutes />
+    //   </AuthGate>
+    // </AuthProvider>
   );
-}
+};
 
 export default App;

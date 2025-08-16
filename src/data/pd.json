@@ -1,0 +1,32 @@
+[
+  {
+    "id": "l1",
+    "title": "Dell XPS 13",
+    "price": 124999,
+    "category": "phones"
+  },
+  {
+    "id": "p1",
+    "title": "iPhone 14",
+    "price": 79999,
+    "category": "phones"
+  },
+  {
+    "id": "t1",
+    "title": "iPad Pro",
+    "price": 99999,
+    "category": "phones"
+  },
+  {
+    "id": "w1",
+    "title": "Apple Watch SE",
+    "price": 32999,
+    "category": "phones"
+  },
+  {
+    "id": "tv1",
+    "title": "Samsung QLED 4K TV",
+    "price": 84999,
+    "category": "phones"
+  }
+]

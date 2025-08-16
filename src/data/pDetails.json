@@ -1,0 +1,71 @@
+[
+  {
+    "title": "Phones",
+    "items": [
+      {
+        "id": 1,
+        "name": "Smartphone X1",
+        "image": "https://images.unsplash.com/photo-1609692814858-f7cd2f0afa4f",
+        "price": "19999"
+      },
+      {
+        "id": 2,
+        "name": "Wireless Headphones",
+        "image": "https://via.placeholder.com/300x200?text=Headphones",
+        "price": "2999"
+      },
+      {
+        "id": 3,
+        "name": "Bluetooth Speaker",
+        "image": "https://via.placeholder.com/300x200?text=Speaker",
+        "price": "1499"
+      }
+    ]
+  },
+  {
+    "title": "Fashion",
+    "items": [
+      {
+        "id": 4,
+        "name": "Men's T-Shirt",
+        "image": "https://via.placeholder.com/300x200?text=T-Shirt",
+        "price": "499"
+      },
+      {
+        "id": 5,
+        "name": "Women's Dress",
+        "image": "https://via.placeholder.com/300x200?text=Dress",
+        "price": "799"
+      },
+      {
+        "id": 6,
+        "name": "Running Shoes",
+        "image": "https://via.placeholder.com/300x200?text=Shoes",
+        "price": "1299"
+      }
+    ]
+  },
+  {
+    "title": "Home",
+    "items": [
+      {
+        "id": 7,
+        "name": "Ceramic Vase",
+        "image": "https://via.placeholder.com/300x200?text=Vase",
+        "price": "699"
+      },
+      {
+        "id": 8,
+        "name": "Wall Clock",
+        "image": "https://via.placeholder.com/300x200?text=Clock",
+        "price": "899"
+      },
+      {
+        "id": 9,
+        "name": "Table Lamp",
+        "image": "https://via.placeholder.com/300x200?text=Lamp",
+        "price": "1099"
+      }
+    ]
+  }
+]

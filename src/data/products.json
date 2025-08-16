@@ -1,0 +1,161 @@
+[
+  {
+    "category": "Mobiles",
+    "items": [
+      {
+        "id": 1,
+        "name": "iPhone 15 Pro",
+        "price": 120000,
+        "image": "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-pro-model-unselect-gallery-1-202309"
+      },
+      {
+        "id": 2,
+        "name": "Samsung Galaxy S24",
+        "price": 98000,
+        "image": "https://images.unsplash.com/file-1707883121023-8e3502977149image"
+      },
+      {
+        "id": 3,
+        "name": "OnePlus 12R",
+        "price": 45000,
+        "image": "https://images.unsplash.com/file-1705123271268-c3eaf6a79b21image"
+      },
+      {
+        "id": 4,
+        "name": "Google Pixel 8",
+        "price": 72000,
+        "image": "https://images.unsplash.com/file-1720553242421-6bc1e26c3d2aimage"
+      },
+      {
+        "id": 5,
+        "name": "Redmi Note 13 Pro",
+        "price": 23000,
+        "image": "https://images.unsplash.com/file-1715714098234-25b8b4e9d8faimage"
+      },
+      {
+        "id": 6,
+        "name": "Realme GT 6",
+        "price": 36000,
+        "image": "https://images.unsplash.com/file-1715652217532-464736461acbimage"
+      },
+      {
+        "id": 7,
+        "name": "iQOO Neo 7",
+        "price": 28999,
+        "image": "https://images.unsplash.com/file-1720553242421-6bc1e26c3d2aimage"
+      },
+      {
+        "id": 8,
+        "name": "Motorola Edge 50",
+        "price": 32000,
+        "image": "https://images.unsplash.com/file-1705123271268-c3eaf6a79b21image"
+      }
+    ]
+  },
+  {
+    "category": "Clothes",
+    "items": [
+      {
+        "id": 9,
+        "name": "Men's Jacket",
+        "price": 3000,
+        "image": "https://images.unsplash.com/file-1635990755334-4bfd90f37242image"
+      },
+      {
+        "id": 10,
+        "name": "Women's Kurti",
+        "price": 1500,
+        "image": "https://images.unsplash.com/file-1724189848065-8ed487be128bimage"
+      },
+      {
+        "id": 11,
+        "name": "Men's Formal Shirt",
+        "price": 1200,
+        "image": "https://images.unsplash.com/file-1715651741414-859baba4300dimage"
+      },
+      {
+        "id": 12,
+        "name": "Women's Denim Jacket",
+        "price": 2500,
+        "image": "https://images.unsplash.com/file-1715714098234-25b8b4e9d8faimage"
+      },
+      {
+        "id": 13,
+        "name": "Men's T-shirt",
+        "price": 900,
+        "image": "https://images.unsplash.com/photo-1602810318383-cd4c9aa9f2ba"
+      },
+      {
+        "id": 14,
+        "name": "Women's Saree",
+        "price": 2200,
+        "image": "https://images.unsplash.com/photo-1585047276317-94b96b0fd194"
+      },
+      {
+        "id": 15,
+        "name": "Men's Jeans",
+        "price": 1700,
+        "image": "https://images.unsplash.com/photo-1598970434795-0c54fe7c0642"
+      },
+      {
+        "id": 16,
+        "name": "Women's Hoodie",
+        "price": 2100,
+        "image": "https://images.unsplash.com/photo-1618354691381-d6ef3d78a8f9"
+      }
+    ]
+  },
+  {
+    "category": "Sports",
+    "items": [
+      {
+        "id": 17,
+        "name": "Football",
+        "price": 1200,
+        "image": "https://images.unsplash.com/photo-1601513753715-6743a9b3a3a6"
+      },
+      {
+        "id": 18,
+        "name": "Cricket Bat",
+        "price": 2400,
+        "image": "https://images.unsplash.com/photo-1605032659686-66a9d64756ff"
+      },
+      {
+        "id": 19,
+        "name": "Badminton Racket",
+        "price": 800,
+        "image": "https://images.unsplash.com/photo-1581196557353-104c92f56d45"
+      },
+      {
+        "id": 20,
+        "name": "Tennis Ball Pack",
+        "price": 450,
+        "image": "https://images.unsplash.com/photo-1605792657660-596af9009f21"
+      },
+      {
+        "id": 21,
+        "name": "Basketball",
+        "price": 1100,
+        "image": "https://images.unsplash.com/photo-1599050705253-ecc1d8173f5a"
+      },
+      {
+        "id": 22,
+        "name": "Skipping Rope",
+        "price": 350,
+        "image": "https://images.unsplash.com/photo-1599050750310-886989057f90"
+      },
+      {
+        "id": 23,
+        "name": "Yoga Mat",
+        "price": 1300,
+        "image": "https://images.unsplash.com/photo-1583454110551-21f8c9732330"
+      },
+      {
+        "id": 24,
+        "name": "Boxing Gloves",
+        "price": 2700,
+        "image": "https://images.unsplash.com/photo-1584943786535-38f6b709a6a1"
+      }
+    ]
+  }
+]

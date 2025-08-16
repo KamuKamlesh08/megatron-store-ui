@@ -1,0 +1,161 @@
+[
+  {
+    "title": "Trending Gadgets",
+    "items": [
+      {
+        "id": 1,
+        "name": "Smart Watch",
+        "image": "https://picsum.photos/seed/smartwatch/300/200",
+        "price": "₹2,999"
+      },
+      {
+        "id": 2,
+        "name": "Wireless Earbuds",
+        "image": "https://picsum.photos/seed/earbuds/300/200",
+        "price": "₹1,499"
+      },
+      {
+        "id": 3,
+        "name": "Fitness Band",
+        "image": "https://picsum.photos/seed/fitnessband/300/200",
+        "price": "₹999"
+      },
+      {
+        "id": 4,
+        "name": "VR Headset",
+        "image": "https://picsum.photos/seed/vrheadset/300/200",
+        "price": "₹4,499"
+      },
+      {
+        "id": 5,
+        "name": "Smart Glasses",
+        "image": "https://picsum.photos/seed/smartglasses/300/200",
+        "price": "₹3,799"
+      },
+      {
+        "id": 6,
+        "name": "Bluetooth Speaker",
+        "image": "https://picsum.photos/seed/speaker/300/200",
+        "price": "₹1,199"
+      },
+      {
+        "id": 7,
+        "name": "Drone Camera",
+        "image": "https://picsum.photos/seed/drone/300/200",
+        "price": "₹7,999"
+      },
+      {
+        "id": 8,
+        "name": "Portable Charger",
+        "image": "https://picsum.photos/seed/charger/300/200",
+        "price": "₹699"
+      }
+    ]
+  },
+  {
+    "title": "Smartphones",
+    "items": [
+      {
+        "id": 9,
+        "name": "iPhone 14 Pro",
+        "image": "https://picsum.photos/seed/iphone14/300/200",
+        "price": "₹1,19,999"
+      },
+      {
+        "id": 10,
+        "name": "Samsung Galaxy S23",
+        "image": "https://picsum.photos/seed/s23/300/200",
+        "price": "₹89,999"
+      },
+      {
+        "id": 11,
+        "name": "OnePlus 11",
+        "image": "https://picsum.photos/seed/oneplus11/300/200",
+        "price": "₹61,999"
+      },
+      {
+        "id": 12,
+        "name": "Pixel 7a",
+        "image": "https://picsum.photos/seed/pixel7a/300/200",
+        "price": "₹43,999"
+      },
+      {
+        "id": 13,
+        "name": "Realme GT Neo",
+        "image": "https://picsum.photos/seed/realme/300/200",
+        "price": "₹27,999"
+      },
+      {
+        "id": 14,
+        "name": "Redmi Note 13",
+        "image": "https://picsum.photos/seed/redmi13/300/200",
+        "price": "₹15,999"
+      },
+      {
+        "id": 15,
+        "name": "iQOO Neo 7",
+        "image": "https://picsum.photos/seed/iqoo7/300/200",
+        "price": "₹29,499"
+      },
+      {
+        "id": 16,
+        "name": "Motorola Edge",
+        "image": "https://picsum.photos/seed/motorola/300/200",
+        "price": "₹34,999"
+      }
+    ]
+  },
+  {
+    "title": "Accessories",
+    "items": [
+      {
+        "id": 17,
+        "name": "Laptop Stand",
+        "image": "https://picsum.photos/seed/laptopstand/300/200",
+        "price": "₹1,299"
+      },
+      {
+        "id": 18,
+        "name": "Mouse Pad",
+        "image": "https://picsum.photos/seed/mousepad/300/200",
+        "price": "₹299"
+      },
+      {
+        "id": 19,
+        "name": "Webcam Cover",
+        "image": "https://picsum.photos/seed/webcamcover/300/200",
+        "price": "₹149"
+      },
+      {
+        "id": 20,
+        "name": "USB Hub",
+        "image": "https://picsum.photos/seed/usbhub/300/200",
+        "price": "₹499"
+      },
+      {
+        "id": 21,
+        "name": "Phone Holder",
+        "image": "https://picsum.photos/seed/phoneholder/300/200",
+        "price": "₹199"
+      },
+      {
+        "id": 22,
+        "name": "Wireless Mouse",
+        "image": "https://picsum.photos/seed/wirelessmouse/300/200",
+        "price": "₹799"
+      },
+      {
+        "id": 23,
+        "name": "Keyboard Cover",
+        "image": "https://picsum.photos/seed/keyboardcover/300/200",
+        "price": "₹399"
+      },
+      {
+        "id": 24,
+        "name": "Desk Organizer",
+        "image": "https://picsum.photos/seed/organizer/300/200",
+        "price": "₹899"
+      }
+    ]
+  }
+]
