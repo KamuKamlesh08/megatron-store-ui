@@ -236,9 +236,9 @@ export const OFFERS: Offer[] = [
   },
   {
     id: "o6",
-    offerName: "Free Shipping on Orders Above ₹999",
-    discountPercent: 0,
-    categoryId: null,
+    offerName: "Free Shipping on Orders Above ₹399",
+    discountPercent: 1,
+    categoryId: "s_clothing",
     productId: null,
     validFrom: "2025-01-01",
     validTo: "2025-12-31",

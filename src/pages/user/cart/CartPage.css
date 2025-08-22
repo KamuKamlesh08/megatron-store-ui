@@ -1,0 +1,24 @@
+:root {
+  --primary: #0077ff;
+  --accent: #00c896;
+  --dark: #111827;
+  --bg: #f9fafc;
+  --bgSoft: #f1faff;
+}
+
+.cart-page {
+  background: var(--bg);
+}
+
+.cart-page .browse-btn {
+  background: var(--dark);
+  border-radius: 10px;
+}
+.cart-page .browse-btn:hover {
+  background: var(--accent);
+}
+
+.empty-title {
+  font-weight: 700;
+  margin-bottom: 4px;
+}

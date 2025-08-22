@@ -11,6 +11,8 @@ import {
 import { useGeolocated } from "react-geolocated";
 import "./Home.css";
 import logoLight from "../../assets/logo-dark-bg.png";
+import wishlistIcon from "../../assets/megatron-wishlist.png";
+import cartIcon from "../../assets/megatron-cart.png";
 
 import {
   Box,
@@ -26,6 +28,23 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { useNavigate } from "react-router-dom"; // ✅ Add Link
 import ScrollableProducts from "./ScrollableProducts";
+
+type CartItem = {
+  productId: string;
+  quantity?: number;
+  priceSnapshot?: number;
+};
+
+const getCartCount = () => {
+  try {
+    const raw = localStorage.getItem("cart");
+    if (!raw) return 0;
+    const cart = JSON.parse(raw) as { items?: CartItem[] };
+    return (cart.items || []).reduce((s, it) => s + (it.quantity ?? 0), 0);
+  } catch {
+    return 0;
+  }
+};
 
 const ScrollableCategory: React.FC<{ offers: Offer[] }> = ({ offers }) => {
   const navigate = useNavigate();
@@ -158,12 +177,27 @@ const ScrollableCategory: React.FC<{ offers: Offer[] }> = ({ offers }) => {
 };
 
 export default function Home() {
+  const navigate = useNavigate();
   const [city, setCity] = useState("Delhi"); // default
   const [showPopup, setShowPopup] = useState(false);
   const [pincode, setPincode] = useState("");
 
   const [showMobileActions, setShowMobileActions] = useState(false);
+  const [cartCount, setCartCount] = useState<number>(getCartCount());
+  useEffect(() => {
+    const sync = () => setCartCount(getCartCount());
+    window.addEventListener("storage", sync);
+    window.addEventListener("cart:updated", sync as EventListener);
+    return () => {
+      window.removeEventListener("storage", sync);
+      window.removeEventListener("cart:updated", sync as EventListener);
+    };
+  }, []);
 
+  const goToCart = () => {
+    //setShowMobileActions(false);
+    navigate("/cart");
+  };
   // Toggle function
   const toggleMobileActions = () => {
     setShowMobileActions(!showMobileActions);
@@ -225,8 +259,19 @@ export default function Home() {
         <div className="actions">
           {/* Desktop: normal icons */}
           <div className="desktop-actions">
-            <span className="wishlist">♥</span>
-            <span className="cart">🛒</span>
+            {/* ✅ wishlist image (className same, so CSS stays) */}
+            <span className="wishlist" role="button" aria-label="Wishlist">
+              <img src={wishlistIcon} alt="Wishlist" className="icon-24" />
+            </span>
+            {/* ✅ cart image with badge */}
+            <button
+              className="cart-icon-wrap"
+              onClick={goToCart}
+              aria-label="Cart"
+            >
+              <img src={cartIcon} alt="Cart" className="icon-24" />
+              {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
+            </button>
           </div>
 
           {/* Mobile: single menu icon */}

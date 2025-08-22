@@ -8,6 +8,9 @@ import CategoryPage from "../pages/CategoryPage"; // 🔥 import here
 import ProductDetail from "../pages/ProductDetail";
 import { AuthProvider } from "../auth/AuthProvider"; // 🔥 import AuthProvider
 import Home from "../pages/user/Home";
+import ProductDetails from "pages/user/product/ProductDetails";
+import CartPage from "pages/user/cart/CartPage";
+import CheckoutPage from "pages/user/checkout/CheckoutPage";
 
 const AppRoutes = () => {
   return (
@@ -20,6 +23,16 @@ const AppRoutes = () => {
           // </SidebarLayout>
         }
       />
+      <Route path="/product/:id" element={<ProductDetails />} />
+      <Route
+        path="/cart"
+        element={
+          // Use your layout if you prefer:
+          // <SidebarLayout><CartPage/></SidebarLayout>
+          <CartPage />
+        }
+      />
+      <Route path="/checkout" element={<CheckoutPage />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route
         path="/products"

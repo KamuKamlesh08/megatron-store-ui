@@ -1,0 +1,105 @@
+:root {
+  --primary: #0077ff;
+  --accent: #00c896;
+  --dark: #111827;
+  --bg: #f9fafc;
+  --bgSoft: #f1faff;
+  --text: #222;
+}
+
+.checkout-page {
+  background: var(--bg);
+}
+.checkout-page .page-title {
+  margin: 8px 0 12px;
+}
+
+/* Panels */
+.checkout-page .panel {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 14px;
+  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+.checkout-page .panel:hover {
+  border-color: var(--accent);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
+}
+.checkout-page .panel-title {
+  font-weight: 800;
+  color: var(--dark);
+  margin-bottom: 10px;
+}
+.checkout-page .field-grid .MuiOutlinedInput-root {
+  background: #fff;
+}
+
+/* Payment radios */
+.checkout-page .radio-group .MuiFormControlLabel-root {
+  margin-right: 18px;
+}
+
+/* Summary Card (sticky) */
+.checkout-page .summary-card {
+  position: sticky;
+  top: 76px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+}
+.checkout-page .summary-title {
+  font-weight: 800;
+  margin-bottom: 8px;
+  color: var(--dark);
+}
+.checkout-page .summary-rows .price-row,
+.checkout-page .summary-rows .total-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.95rem;
+}
+.checkout-page .summary-rows .savings {
+  color: #059669;
+}
+.checkout-page .summary-rows .total-row {
+  font-size: 1.05rem;
+}
+.checkout-page .place-order-btn {
+  margin-top: 12px;
+  width: 100%;
+  background: var(--dark);
+  border-radius: 12px;
+}
+.checkout-page .place-order-btn:hover {
+  background: var(--accent);
+}
+
+/* Recommendations */
+.checkout-page .recommend-wrap {
+  margin-top: 20px;
+  padding-top: 10px;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .checkout-page .summary-card {
+    position: static;
+    margin-top: 8px;
+  }
+}
+@media (max-width: 768px) {
+  .checkout-page .panel {
+    border-radius: 12px;
+    padding: 14px;
+  }
+  .checkout-page .summary-card {
+    border-radius: 12px;
+  }
+}
