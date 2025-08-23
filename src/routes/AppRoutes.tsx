@@ -11,55 +11,61 @@ import Home from "../pages/user/Home";
 import ProductDetails from "pages/user/product/ProductDetails";
 import CartPage from "pages/user/cart/CartPage";
 import CheckoutPage from "pages/user/checkout/CheckoutPage";
+import OrderSuccess from "pages/user/order/OrderSuccess";
+import ScrollToTop from "components/ScrollToTop";
 
 const AppRoutes = () => {
   return (
-    <Routes>
-      <Route
-        path="/"
-        element={
-          // <SidebarLayout>
-          <Home />
-          // </SidebarLayout>
-        }
-      />
-      <Route path="/product/:id" element={<ProductDetails />} />
-      <Route
-        path="/cart"
-        element={
-          // Use your layout if you prefer:
-          // <SidebarLayout><CartPage/></SidebarLayout>
-          <CartPage />
-        }
-      />
-      <Route path="/checkout" element={<CheckoutPage />} />
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route
-        path="/products"
-        element={
-          <SidebarLayout>
-            <Products />
-          </SidebarLayout>
-        }
-      />
-      <Route
-        path="/products/:slug"
-        element={
-          <SidebarLayout>
-            <CategoryPage />
-          </SidebarLayout>
-        }
-      />
-
-      <Route
-        path="/products/:slug/:productId"
-        element={
-          <SidebarLayout>
-            <ProductDetail />
-          </SidebarLayout>
-        }
-      />
-    </Routes>
+    <>
+      <ScrollToTop />
+      <Routes>
+        <Route
+          path="/"
+          element={
+            // <SidebarLayout>
+            <Home />
+            // </SidebarLayout>
+          }
+        />
+        <Route path="/product/:id" element={<ProductDetails />} />
+        // routes
+        <Route path="/order/success" element={<OrderSuccess />} />
+        <Route
+          path="/cart"
+          element={
+            // Use your layout if you prefer:
+            // <SidebarLayout><CartPage/></SidebarLayout>
+            <CartPage />
+          }
+        />
+        <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route
+          path="/products"
+          element={
+            <SidebarLayout>
+              <Products />
+            </SidebarLayout>
+          }
+        />
+        <Route
+          path="/products/:slug"
+          element={
+            <SidebarLayout>
+              <CategoryPage />
+            </SidebarLayout>
+          }
+        />
+        <Route
+          path="/products/:slug/:productId"
+          element={
+            <SidebarLayout>
+              <ProductDetail />
+            </SidebarLayout>
+          }
+        />
+      </Routes>
+    </>
   );
 };
 

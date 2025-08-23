@@ -22,6 +22,8 @@ import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import BoltIcon from "@mui/icons-material/Bolt";
 
+import useCity from "../../../hooks/useCity";
+
 import {
   PRODUCTS,
   SUBCATEGORIES,
@@ -32,9 +34,11 @@ import {
   Product,
   Cart,
   CartItem,
+  getInventoryStock,
 } from "../../../data/dummyData"; // adjust path to your dummyData file
 import ScrollableProducts from "../ScrollableProducts"; // adjust path if needed
 import Header from "../common/Header";
+import { writeCart } from "../util/cart";
 
 function formatINR(n: number) {
   return `₹${n.toLocaleString("en-IN")}`;
@@ -48,6 +52,7 @@ function isOfferActive(validFrom: string, validTo: string) {
 }
 
 export default function ProductDetails() {
+  const city = useCity();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [snack, setSnack] = useState<{
@@ -122,13 +127,19 @@ export default function ProductDetails() {
     };
   }, [product, bestDiscountOffer]);
 
+  // const stock = useMemo(() => {
+  //   if (!product) return 0;
+  //   const rec = INVENTORY.find(
+  //     (i) => i.productId === product.id && i.city === USER.city
+  //   );
+  //   return rec?.stock ?? 0;
+  // }, [product]);
+
+  // replace your current "stock" useMemo:
   const stock = useMemo(() => {
     if (!product) return 0;
-    const rec = INVENTORY.find(
-      (i) => i.productId === product.id && i.city === USER.city
-    );
-    return rec?.stock ?? 0;
-  }, [product]);
+    return getInventoryStock(product.id, city);
+  }, [product, city]);
 
   const deliveryEta = useMemo(() => {
     const days = 3 + Math.floor(Math.random() * 3); // 3–5 days
@@ -159,11 +170,13 @@ export default function ProductDetails() {
     } else {
       cart.items.push({
         productId: product.id,
+        sku: product.sku,
         quantity: qty,
         priceSnapshot: pricing.effective,
       });
     }
-    localStorage.setItem("cart", JSON.stringify(cart));
+    writeCart(cart);
+    //localStorage.setItem("cart", JSON.stringify(cart));
     setSnack({ open: true, msg: "Added to cart!", type: "success" });
   };
 
@@ -325,9 +338,7 @@ export default function ProductDetails() {
               <Chip
                 className={`stock-chip ${stock > 0 ? "in" : "out"}`}
                 label={
-                  stock > 0
-                    ? `In stock (${stock} in ${USER.city})`
-                    : "Out of stock"
+                  stock > 0 ? `In stock (${stock} in ${city})` : "Out of stock"
                 }
                 color={stock > 0 ? "success" : "default"}
                 variant="outlined"
@@ -340,7 +351,7 @@ export default function ProductDetails() {
               >
                 <LocalShippingIcon fontSize="small" />
                 <Typography variant="body2">
-                  Deliver to <b>{USER.city}</b> by <b>{deliveryEta}</b>
+                  Deliver to <b>{city}</b> by <b>{deliveryEta}</b>
                 </Typography>
               </Stack>
             </Stack>

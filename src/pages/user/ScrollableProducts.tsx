@@ -89,6 +89,7 @@ const ScrollableProducts: React.FC<{ products: Product[] }> = ({
 
         <Box
           ref={scrollRef}
+          className="h-scroll product-row"
           sx={{
             display: "flex",
             overflowX: "auto",
@@ -102,6 +103,7 @@ const ScrollableProducts: React.FC<{ products: Product[] }> = ({
         >
           {products.map((p) => (
             <Card
+              className="h-item"
               key={p.id}
               sx={{
                 minWidth: 200,

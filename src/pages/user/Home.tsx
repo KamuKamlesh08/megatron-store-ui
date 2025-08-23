@@ -28,6 +28,7 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { useNavigate } from "react-router-dom"; // ✅ Add Link
 import ScrollableProducts from "./ScrollableProducts";
+import Header from "./common/Header";
 
 type CartItem = {
   productId: string;
@@ -119,6 +120,7 @@ const ScrollableCategory: React.FC<{ offers: Offer[] }> = ({ offers }) => {
 
         <Box
           ref={scrollRef}
+          className="h-scroll offer-row"
           sx={{
             display: "flex",
             overflowX: "auto",
@@ -133,6 +135,7 @@ const ScrollableCategory: React.FC<{ offers: Offer[] }> = ({ offers }) => {
           {offers.map((item) => (
             <Card
               key={item.id}
+              className="h-item"
               sx={{
                 minWidth: 240,
                 borderRadius: 2,
@@ -178,7 +181,9 @@ const ScrollableCategory: React.FC<{ offers: Offer[] }> = ({ offers }) => {
 
 export default function Home() {
   const navigate = useNavigate();
-  const [city, setCity] = useState("Delhi"); // default
+  const [city, setCity] = useState(
+    () => localStorage.getItem("city") || "Delhi"
+  );
   const [showPopup, setShowPopup] = useState(false);
   const [pincode, setPincode] = useState("");
 
@@ -193,6 +198,20 @@ export default function Home() {
       window.removeEventListener("cart:updated", sync as EventListener);
     };
   }, []);
+
+  useEffect(() => {
+    const syncCity = () => {
+      const c = localStorage.getItem("city");
+      if (c && c !== city) setCity(c);
+    };
+    syncCity(); // initial pull
+    window.addEventListener("location:updated", syncCity as EventListener);
+    window.addEventListener("storage", syncCity);
+    return () => {
+      window.removeEventListener("location:updated", syncCity as EventListener);
+      window.removeEventListener("storage", syncCity);
+    };
+  }, [city]);
 
   const goToCart = () => {
     //setShowMobileActions(false);
@@ -238,78 +257,11 @@ export default function Home() {
   return (
     <div className="home-page">
       {/* Header */}
-      <div className="header">
-        <div className="left">
-          <div className="logo">
-            <img src={logoLight} alt="Megatron Store" />
-          </div>
-          <button className="location-btn" onClick={() => setShowPopup(true)}>
-            📍 {city} ▾
-          </button>
-        </div>
-
-        <div className="search-bar">
-          <input
-            type="text"
-            placeholder={`Search in ${city}: mobiles, shoes...`}
-          />
-          <button>🔎</button>
-        </div>
-
-        <div className="actions">
-          {/* Desktop: normal icons */}
-          <div className="desktop-actions">
-            {/* ✅ wishlist image (className same, so CSS stays) */}
-            <span className="wishlist" role="button" aria-label="Wishlist">
-              <img src={wishlistIcon} alt="Wishlist" className="icon-24" />
-            </span>
-            {/* ✅ cart image with badge */}
-            <button
-              className="cart-icon-wrap"
-              onClick={goToCart}
-              aria-label="Cart"
-            >
-              <img src={cartIcon} alt="Cart" className="icon-24" />
-              {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
-            </button>
-          </div>
-
-          {/* Mobile: single menu icon */}
-          <div className="mobile-actions-wrapper">
-            <span className="mobile-menu-icon" onClick={toggleMobileActions}>
-              ☰
-            </span>
-            {showMobileActions && (
-              <div className="mobile-actions-popup">
-                <span className="wishlist">♥ Wishlist</span>
-                <span className="cart">🛒 Cart</span>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Location Popup */}
-      {showPopup && (
-        <div className="location-popup">
-          <div className="popup-content">
-            <h3>Select Location</h3>
-            <button onClick={detectLocation}>📍 Detect Current Location</button>
-            <div className="pincode-box">
-              <input
-                type="text"
-                placeholder="Enter City"
-                value={pincode}
-                onChange={(e) => setPincode(e.target.value)}
-              />
-              <button onClick={applyPincode}>Apply</button>
-            </div>
-            <button className="close" onClick={() => setShowPopup(false)}>
-              Close
-            </button>
-          </div>
-        </div>
-      )}
+      <Header
+        city={city}
+        logoSrc={logoLight}
+        onSearch={(q) => console.log("search:", q)}
+      />
 
       {/* Hero Banner */}
       <section className="hero-banner">

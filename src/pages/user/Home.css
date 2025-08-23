@@ -419,6 +419,49 @@
   font-size: 24px;
 }
 
+/* -------- Safari / iOS only fixes -------- */
+/* iOS Safari + WebKit webviews */
+@supports (-webkit-touch-callout: none) {
+  .h-scroll {
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-x: contain;
+    touch-action: pan-x; /* iOS horizontal swipe ko allow */
+    scroll-snap-type: x mandatory;
+    gap: 16px; /* safe gap */
+  }
+  .h-scroll::-webkit-scrollbar {
+    display: none;
+  }
+  .h-item {
+    scroll-snap-align: start;
+  }
+  .offer-row .h-item {
+    min-width: clamp(200px, 65vw, 260px);
+  }
+  .product-row .h-item {
+    min-width: clamp(180px, 55vw, 240px);
+  }
+  .h-item img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+}
+
+/* Desktop Safari (WebKit) target — Chrome/Firefox ignore karte hain */
+@media not all and (min-resolution: 0.001dpcm) {
+  @supports (-webkit-appearance: none) {
+    .h-scroll {
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x mandatory;
+    }
+    .h-item {
+      scroll-snap-align: start;
+    }
+  }
+}
+
 /* Mobile specific */
 @media (max-width: 768px) {
   .header {

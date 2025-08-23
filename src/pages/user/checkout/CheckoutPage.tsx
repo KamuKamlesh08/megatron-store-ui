@@ -1,33 +1,40 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   Box,
-  Grid,
-  Typography,
+  Button,
+  Divider,
+  Stack,
   TextField,
+  Typography,
+  Alert,
   RadioGroup,
   FormControlLabel,
   Radio,
-  Button,
-  Divider,
-  Snackbar,
-  Alert,
-  Stack,
+  FormLabel,
+  Paper,
+  Chip,
 } from "@mui/material";
 
-import Header from "../common/Header";
-import ScrollableProducts from "../ScrollableProducts"; // 👉 adjust path if needed
-import { PRODUCTS, USER, Product } from "../../../data/dummyData"; // 👉 adjust path if needed
+import {
+  Cart,
+  PRODUCTS,
+  Product,
+  getCurrentCity,
+  getProductBySku,
+  getInventoryStockBySku,
+} from "../../../data/dummyData";
 
+import Header from "../common/Header";
 import "./CheckoutPage.css";
 
-type CartItem = { productId: string; quantity: number; priceSnapshot: number };
-type Cart = {
-  id: string;
-  userId: string;
-  items: CartItem[];
-  status: "active" | "completed";
+type CartItem = {
+  productId: string;
+  sku: string;
+  quantity: number;
+  priceSnapshot: number;
 };
+
+type PaymentMethod = "upi" | "card" | "cod";
 
 function readCart(): Cart | null {
   try {
@@ -38,29 +45,53 @@ function readCart(): Cart | null {
   }
 }
 
-const inr = (n: number) => `₹${n.toLocaleString("en-IN")}`;
-
 export default function CheckoutPage() {
-  const navigate = useNavigate();
   const [cart, setCart] = useState<Cart | null>(readCart());
-  const [snack, setSnack] = useState<{
-    open: boolean;
-    msg: string;
-    type: "success" | "error";
-  }>({
-    open: false,
-    msg: "",
-    type: "success",
+  const city = getCurrentCity();
+
+  // Address state
+  const [addr, setAddr] = useState({
+    name: "",
+    phone: "",
+    line1: "",
+    pincode: "",
   });
 
-  // Address form
-  const [name, setName] = useState(USER.name || "");
-  const [phone, setPhone] = useState("");
-  const [line1, setLine1] = useState("");
-  const [line2, setLine2] = useState("");
-  const [city, setCity] = useState(USER.city || "Delhi");
-  const [pincode, setPincode] = useState("");
-  const [payment, setPayment] = useState<"cod" | "upi" | "card">("cod");
+  // Payment state
+  const [method, setMethod] = useState<PaymentMethod>("upi");
+  const [upiId, setUpiId] = useState("");
+  const [cardName, setCardName] = useState("");
+  const [cardNumber, setCardNumber] = useState("");
+  const [cardExpiry, setCardExpiry] = useState("");
+  const [cardCvv, setCardCvv] = useState("");
+
+  const [error, setError] = useState<string | null>(null);
+  const [placing, setPlacing] = useState(false);
+
+  const overlayCopy = useMemo(() => {
+    switch (method) {
+      case "cod":
+        return {
+          title: "Confirming your order…",
+          sub: "Reserving stock and preparing COD confirmation. Please don’t refresh.",
+        };
+      case "upi":
+        return {
+          title: "Finalizing your order…",
+          sub: "Awaiting UPI authorization and reserving stock. Please don’t refresh.",
+        };
+      case "card":
+        return {
+          title: "Finalizing your order…",
+          sub: "Processing card securely and reserving stock. Please don’t refresh.",
+        };
+      default:
+        return {
+          title: "Finalizing your order…",
+          sub: "Reserving stock and preparing confirmation. Please don’t refresh.",
+        };
+    }
+  }, [method]);
 
   useEffect(() => {
     const sync = () => setCart(readCart());
@@ -72,101 +103,161 @@ export default function CheckoutPage() {
     };
   }, []);
 
-  const { itemsCount, subtotal, products } = useMemo(() => {
-    const empty = { itemsCount: 0, subtotal: 0, products: [] as Product[] };
-    if (!cart?.items?.length) return empty;
+  // Build lines, check stock, compute totals
+  const { lines, ok, msg, subtotal, shippingFee, codFee, total } =
+    useMemo(() => {
+      const empty = {
+        lines: [] as { item: CartItem; product: Product; stock: number }[],
+        ok: false,
+        msg: "Cart is empty",
+        subtotal: 0,
+        shippingFee: 0,
+        codFee: 0,
+        total: 0,
+      };
+      if (!cart?.items?.length) return empty;
 
-    const prods: Product[] = [];
-    let count = 0;
-    let sum = 0;
-    for (const it of cart.items) {
-      const p = PRODUCTS.find((pp) => pp.id === it.productId);
-      if (!p) continue;
-      prods.push(p);
-      count += it.quantity ?? 0;
-      sum += (it.quantity ?? 0) * (it.priceSnapshot ?? p.price);
+      const lines: { item: CartItem; product: Product; stock: number }[] = [];
+      let sum = 0;
+
+      for (const it of cart.items as CartItem[]) {
+        const p =
+          getProductBySku(it.sku) ||
+          PRODUCTS.find((pp) => pp.id === it.productId);
+        if (!p)
+          return { ...empty, msg: "Some products are no longer available" };
+
+        const stock = getInventoryStockBySku(p.sku, city);
+        if (stock < it.quantity) {
+          return {
+            ...empty,
+            msg: `Insufficient stock for ${p.name} in ${city}`,
+          };
+        }
+
+        const lineTotal = (it.quantity ?? 0) * (it.priceSnapshot ?? p.price);
+        lines.push({ item: it, product: p, stock });
+        sum += lineTotal;
+      }
+
+      // Simple shipping logic (demo):
+      // Free shipping >= ₹999, otherwise ₹49. COD adds ₹30.
+      const shippingFee = sum >= 999 ? 0 : 49;
+      const codFee = 0; // will be applied dynamically below in total computation
+
+      return {
+        lines,
+        ok: true,
+        msg: "",
+        subtotal: sum,
+        shippingFee,
+        codFee,
+        total: sum + shippingFee, // + codFee if COD selected (added at render time)
+      };
+    }, [cart, city]);
+
+  // Field validations (lightweight)
+  const validPhone = (p: string) => /^[0-9]{10}$/.test(p.trim());
+  const validPincode = (p: string) => /^[1-9][0-9]{5}$/.test(p.trim());
+  const validUpi = (u: string) => /^[\w.\-]{2,}@[a-zA-Z]{2,}$/.test(u.trim());
+  const onlyDigits = (s: string) => s.replace(/\D/g, "");
+
+  const validateCard = () => {
+    const num = onlyDigits(cardNumber);
+    const exp = cardExpiry.trim();
+    const cvv = cardCvv.trim();
+    const name = cardName.trim().length >= 2;
+
+    const numOk = num.length >= 13 && num.length <= 19; // lenient
+    const expOk = /^(0[1-9]|1[0-2])\/\d{2}$/.test(exp);
+    const cvvOk = /^[0-9]{3,4}$/.test(cvv);
+
+    return name && numOk && expOk && cvvOk;
+  };
+
+  const computedTotal = method === "cod" ? total + 30 : total;
+
+  const placeOrder = async () => {
+    setError(null);
+
+    // ✅ validations (unchanged)
+    if (!ok) {
+      setError(msg || "Please resolve cart issues before placing order.");
+      return;
     }
-    return { itemsCount: count, subtotal: sum, products: prods };
-  }, [cart]);
-
-  const shipping = subtotal >= 999 ? 0 : 49;
-  const savings = 0;
-  const total = subtotal + shipping;
-
-  const eta = useMemo(() => {
-    const d = new Date();
-    d.setDate(d.getDate() + (3 + Math.floor(Math.random() * 3)));
-    return d.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
-  }, []);
-
-  const validate = () => {
     if (
-      !name.trim() ||
-      !phone.trim() ||
-      !line1.trim() ||
-      !city.trim() ||
-      !pincode.trim()
+      !addr.name ||
+      !validPhone(addr.phone) ||
+      !addr.line1 ||
+      !validPincode(addr.pincode)
     ) {
-      setSnack({
-        open: true,
-        msg: "Please complete the address details.",
-        type: "error",
-      });
-      return false;
+      setError(
+        "Please fill a valid shipping address (name, 10-digit phone, address, 6-digit pincode)."
+      );
+      return;
     }
-    if (!/^\d{6}$/.test(pincode)) {
-      setSnack({
-        open: true,
-        msg: "Enter a valid 6-digit pincode.",
-        type: "error",
-      });
-      return false;
+    if (method === "upi" && !validUpi(upiId)) {
+      setError("Enter a valid UPI ID (e.g., ravi@okicici).");
+      return;
     }
-    if (!/^\d{10}$/.test(phone)) {
-      setSnack({
-        open: true,
-        msg: "Enter a valid 10-digit phone number.",
-        type: "error",
-      });
-      return false;
+    if (method === "card" && !validateCard()) {
+      setError("Please enter valid card details.");
+      return;
     }
-    if (!itemsCount) {
-      setSnack({ open: true, msg: "Your cart is empty.", type: "error" });
-      return false;
+    if (method === "cod" && computedTotal > 10000) {
+      setError("Cash on Delivery is not available for orders above ₹10,000.");
+      return;
     }
-    return true;
+
+    // 🔵 show overlay
+    setPlacing(true);
+
+    // 🧾 save snapshot for success page
+    const savedOrder = {
+      id: `ORD-${Date.now()}`,
+      date: new Date().toISOString(),
+      city,
+      paymentMethod: method,
+      address: addr,
+      items: cart!.items.map((it) => ({
+        productId: it.productId,
+        sku: it.sku,
+        quantity: it.quantity,
+        price: it.priceSnapshot,
+      })),
+      amounts: {
+        subtotal,
+        shipping: shippingFee,
+        codFee: method === "cod" ? 30 : 0,
+        total: computedTotal,
+      },
+    };
+    sessionStorage.setItem("order:latest", JSON.stringify(savedOrder));
+    localStorage.setItem("order:latest", JSON.stringify(savedOrder));
+
+    // ⏳ wait 5s, THEN clear cart + redirect
+    setTimeout(() => {
+      localStorage.removeItem("cart");
+      window.dispatchEvent(new Event("cart:updated"));
+      // don't setPlacing(false); we are navigating away
+      window.location.href = "/order/success";
+    }, 5000);
   };
 
-  const placeOrder = () => {
-    if (!validate()) return;
-    localStorage.removeItem("cart");
-    window.dispatchEvent(new Event("cart:updated"));
-    setSnack({
-      open: true,
-      msg: "Order placed successfully! 🎉",
-      type: "success",
-    });
-    setTimeout(() => navigate("/"), 900);
-  };
-
-  if (!itemsCount) {
+  if (!cart?.items?.length) {
     return (
       <Box
         className="checkout-page"
         p={{ xs: 2, md: 3 }}
-        maxWidth="1120px"
+        maxWidth="900px"
         mx="auto"
       >
         <Header city={city} onOpenLocation={() => {}} />
-        <Typography variant="h6" sx={{ mt: 2 }}>
-          No items to checkout.
+        <Typography variant="h6" mt={2}>
+          Your cart is empty
         </Typography>
-        <Button
-          sx={{ mt: 2 }}
-          variant="contained"
-          onClick={() => navigate("/")}
-        >
-          Continue Shopping
+        <Button sx={{ mt: 1 }} href="/" variant="contained">
+          Go shopping
         </Button>
       </Box>
     );
@@ -176,166 +267,278 @@ export default function CheckoutPage() {
     <Box
       className="checkout-page"
       p={{ xs: 2, md: 3 }}
-      maxWidth="1120px"
+      maxWidth="1000px"
       mx="auto"
     >
       <Header city={city} onOpenLocation={() => {}} />
 
-      <Typography variant="h5" fontWeight={800} className="page-title">
+      <Typography variant="h5" fontWeight={800}>
         Checkout
       </Typography>
+      <Typography variant="body2" color="text.secondary">
+        Delivering to {city}
+      </Typography>
 
-      <Grid container spacing={2.5} alignItems="flex-start">
-        {/* Left Column - Forms */}
-        <Grid>
-          {/* Address Panel */}
-          <Box className="panel">
-            <Typography className="panel-title">Delivery Address</Typography>
-            <Grid container spacing={1.5} className="field-grid">
-              <Grid>
-                <TextField
-                  size="small"
-                  fullWidth
-                  label="Full Name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-              </Grid>
-              <Grid>
-                <TextField
-                  size="small"
-                  fullWidth
-                  label="Phone"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  inputProps={{ inputMode: "numeric", pattern: "\\d{10}" }}
-                />
-              </Grid>
-              <Grid>
-                <TextField
-                  size="small"
-                  fullWidth
-                  label="Address Line 1"
-                  value={line1}
-                  onChange={(e) => setLine1(e.target.value)}
-                />
-              </Grid>
-              <Grid>
-                <TextField
-                  size="small"
-                  fullWidth
-                  label="Address Line 2 (optional)"
-                  value={line2}
-                  onChange={(e) => setLine2(e.target.value)}
-                />
-              </Grid>
-              <Grid>
-                <TextField
-                  size="small"
-                  fullWidth
-                  label="City"
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                />
-              </Grid>
-              <Grid>
-                <TextField
-                  size="small"
-                  fullWidth
-                  label="Pincode"
-                  value={pincode}
-                  onChange={(e) => setPincode(e.target.value)}
-                  inputProps={{ inputMode: "numeric", pattern: "\\d{6}" }}
-                />
-              </Grid>
-            </Grid>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-              Estimated delivery to <b>{city}</b> by <b>{eta}</b>.
+      {error && (
+        <Alert sx={{ mt: 1 }} severity="error">
+          {error}
+        </Alert>
+      )}
+
+      <Divider sx={{ my: 2 }} />
+
+      <Stack
+        direction={{ xs: "column", md: "row" }}
+        spacing={2}
+        alignItems="flex-start"
+      >
+        {/* Left: Address + Payment */}
+        <Stack flex={1} spacing={2} minWidth={0}>
+          {/* Address */}
+          <Paper className="panel" elevation={0}>
+            <Typography
+              className="panel-title"
+              variant="subtitle1"
+              fontWeight={700}
+            >
+              Shipping Address
             </Typography>
-          </Box>
+            <Stack className="panel-body" spacing={1.2}>
+              <TextField
+                size="small"
+                label="Full Name"
+                value={addr.name}
+                onChange={(e) =>
+                  setAddr((a) => ({ ...a, name: e.target.value }))
+                }
+              />
+              <TextField
+                size="small"
+                label="Phone (10 digits)"
+                inputMode="numeric"
+                value={addr.phone}
+                onChange={(e) =>
+                  setAddr((a) => ({ ...a, phone: e.target.value }))
+                }
+                error={!!addr.phone && !validPhone(addr.phone)}
+                helperText={
+                  !!addr.phone && !validPhone(addr.phone)
+                    ? "Invalid phone"
+                    : " "
+                }
+              />
+              <TextField
+                size="small"
+                label="Address Line"
+                value={addr.line1}
+                onChange={(e) =>
+                  setAddr((a) => ({ ...a, line1: e.target.value }))
+                }
+              />
+              <TextField
+                size="small"
+                label="Pincode"
+                inputMode="numeric"
+                value={addr.pincode}
+                onChange={(e) =>
+                  setAddr((a) => ({ ...a, pincode: e.target.value }))
+                }
+                error={!!addr.pincode && !validPincode(addr.pincode)}
+                helperText={
+                  !!addr.pincode && !validPincode(addr.pincode)
+                    ? "Invalid pincode"
+                    : " "
+                }
+              />
+            </Stack>
+          </Paper>
 
-          {/* Payment Panel */}
-          <Box className="panel">
-            <Typography className="panel-title">Payment Method</Typography>
+          {/* Payment */}
+          <Paper className="panel" elevation={0}>
+            <Typography
+              className="panel-title"
+              variant="subtitle1"
+              fontWeight={700}
+            >
+              Payment Method
+            </Typography>
+
             <RadioGroup
               row
-              value={payment}
-              onChange={(e) => setPayment(e.target.value as any)}
-              className="radio-group"
+              value={method}
+              onChange={(e) => setMethod(e.target.value as PaymentMethod)}
+              className="pm-group"
             >
+              <FormControlLabel value="upi" control={<Radio />} label="UPI" />
+              <FormControlLabel
+                value="card"
+                control={<Radio />}
+                label="Credit/Debit Card"
+              />
               <FormControlLabel
                 value="cod"
                 control={<Radio />}
                 label="Cash on Delivery"
               />
-              <FormControlLabel
-                value="upi"
-                control={<Radio />}
-                label="UPI / Wallet"
-              />
-              <FormControlLabel
-                value="card"
-                control={<Radio />}
-                label="Credit / Debit Card"
-              />
             </RadioGroup>
 
-            {payment === "upi" && (
-              <TextField
-                size="small"
-                fullWidth
-                sx={{ mt: 1 }}
-                label="UPI ID (e.g. name@upi)"
-              />
+            {/* Method-specific fields */}
+            {method === "upi" && (
+              <Stack className="panel-body" spacing={1.2}>
+                <TextField
+                  size="small"
+                  label="UPI ID"
+                  placeholder="yourname@okaxis"
+                  value={upiId}
+                  onChange={(e) => setUpiId(e.target.value)}
+                  error={!!upiId && !validUpi(upiId)}
+                  helperText={
+                    !!upiId && !validUpi(upiId) ? "Invalid UPI ID" : " "
+                  }
+                />
+                <Typography variant="caption" color="text.secondary">
+                  You’ll be prompted in your UPI app to approve the payment.
+                </Typography>
+              </Stack>
             )}
-            {payment === "card" && (
-              <Grid container spacing={1.5} sx={{ mt: 0.5 }}>
-                <Grid>
+
+            {method === "card" && (
+              <Stack className="panel-body" spacing={1.2}>
+                <TextField
+                  size="small"
+                  label="Name on card"
+                  value={cardName}
+                  onChange={(e) => setCardName(e.target.value)}
+                />
+                <TextField
+                  size="small"
+                  label="Card number"
+                  inputMode="numeric"
+                  placeholder="XXXX XXXX XXXX XXXX"
+                  value={cardNumber}
+                  onChange={(e) => setCardNumber(e.target.value)}
+                />
+                <Stack direction="row" spacing={1}>
                   <TextField
                     size="small"
-                    fullWidth
-                    label="Card Number"
-                    placeholder="4111 1111 1111 1111"
+                    label="MM/YY"
+                    placeholder="MM/YY"
+                    value={cardExpiry}
+                    onChange={(e) => setCardExpiry(e.target.value)}
                   />
-                </Grid>
-                <Grid>
-                  <TextField size="small" fullWidth label="Expiry (MM/YY)" />
-                </Grid>
-                <Grid>
-                  <TextField size="small" fullWidth label="CVV" />
-                </Grid>
-              </Grid>
+                  <TextField
+                    size="small"
+                    label="CVV"
+                    inputMode="numeric"
+                    value={cardCvv}
+                    onChange={(e) => setCardCvv(e.target.value)}
+                  />
+                </Stack>
+                <Typography variant="caption" color="text.secondary">
+                  Your card will be securely processed.
+                </Typography>
+              </Stack>
             )}
-          </Box>
-        </Grid>
 
-        {/* Right Column - Summary */}
-        <Grid>
-          <Box className="summary-card">
-            <Typography className="summary-title">Order Summary</Typography>
+            {method === "cod" && (
+              <Stack className="panel-body" spacing={1}>
+                <Alert severity="info" variant="outlined">
+                  COD charge ₹30 applies. Not available above ₹10,000.
+                </Alert>
+              </Stack>
+            )}
+          </Paper>
+        </Stack>
 
-            <Stack spacing={0.75} className="summary-rows">
-              <div className="price-row">
-                <span>Items ({itemsCount})</span>
-                <b>{inr(subtotal)}</b>
-              </div>
-              <div className="price-row">
-                <span>Shipping</span>
-                <b>{shipping === 0 ? "FREE" : inr(shipping)}</b>
-              </div>
-              {savings > 0 && (
-                <div className="price-row savings">
-                  <span>Savings</span>
-                  <b>-{inr(savings)}</b>
-                </div>
-              )}
-              <Divider sx={{ my: 1 }} />
-              <div className="total-row">
-                <span>Total</span>
-                <b>{inr(total)}</b>
-              </div>
-              <Typography variant="caption" color="text.secondary">
-                Includes all taxes.
+        {/* Right: Summary */}
+        <Paper className="panel summary" elevation={0}>
+          <Typography
+            className="panel-title"
+            variant="subtitle1"
+            fontWeight={700}
+          >
+            Order Summary
+          </Typography>
+
+          <Stack className="panel-body" spacing={1}>
+            {cart.items.map((it: CartItem) => {
+              const p =
+                getProductBySku(it.sku) ||
+                PRODUCTS.find((pp) => pp.id === it.productId)!;
+              return (
+                <Stack
+                  key={p.sku}
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Stack
+                    direction="row"
+                    spacing={1.2}
+                    alignItems="center"
+                    minWidth={0}
+                  >
+                    <img
+                      src={p.image}
+                      alt={p.name}
+                      width={48}
+                      height={48}
+                      style={{ borderRadius: 8, objectFit: "cover" }}
+                    />
+                    <Box sx={{ minWidth: 0 }}>
+                      <Typography noWrap fontWeight={600}>
+                        {p.name}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        SKU: {p.sku}
+                      </Typography>
+                      <Chip
+                        size="small"
+                        variant="outlined"
+                        label={`Qty: ${it.quantity}`}
+                        sx={{ mt: 0.5 }}
+                      />
+                    </Box>
+                  </Stack>
+                  <Typography fontWeight={700}>
+                    ₹
+                    {(
+                      it.quantity * (it.priceSnapshot ?? p.price)
+                    ).toLocaleString("en-IN")}
+                  </Typography>
+                </Stack>
+              );
+            })}
+
+            <Divider sx={{ my: 1 }} />
+
+            <Stack direction="row" justifyContent="space-between">
+              <Typography color="text.secondary">Items Subtotal</Typography>
+              <Typography>₹{subtotal.toLocaleString("en-IN")}</Typography>
+            </Stack>
+            <Stack direction="row" justifyContent="space-between">
+              <Typography color="text.secondary">Shipping</Typography>
+              <Typography>
+                {shippingFee === 0 ? "FREE" : `₹${shippingFee}`}
+              </Typography>
+            </Stack>
+            {method === "cod" && (
+              <Stack direction="row" justifyContent="space-between">
+                <Typography color="text.secondary">COD charges</Typography>
+                <Typography>₹30</Typography>
+              </Stack>
+            )}
+
+            <Divider sx={{ my: 1 }} />
+
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              alignItems="center"
+            >
+              <Typography fontWeight={800}>Payable Total</Typography>
+              <Typography fontWeight={900} fontSize="1.15rem">
+                ₹{computedTotal.toLocaleString("en-IN")}
               </Typography>
             </Stack>
 
@@ -344,36 +547,28 @@ export default function CheckoutPage() {
               variant="contained"
               size="large"
               onClick={placeOrder}
+              disabled={!ok || placing}
+              sx={{ mt: 1 }}
             >
-              Place Order
+              {placing
+                ? "Placing..."
+                : method === "cod"
+                ? "Place Order (COD)"
+                : "Pay & Place Order"}
             </Button>
-          </Box>
-        </Grid>
-      </Grid>
+          </Stack>
+        </Paper>
+      </Stack>
 
-      {/* Recommendations */}
-      <Box className="recommend-wrap">
-        <Typography variant="subtitle1" fontWeight={700} mb={1}>
-          You might also like
-        </Typography>
-        <ScrollableProducts products={products} />
-      </Box>
-
-      <Snackbar
-        open={snack.open}
-        autoHideDuration={1600}
-        onClose={() => setSnack((s) => ({ ...s, open: false }))}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert
-          onClose={() => setSnack((s) => ({ ...s, open: false }))}
-          severity={snack.type}
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          {snack.msg}
-        </Alert>
-      </Snackbar>
+      {placing && (
+        <div className="loading-overlay" role="alert" aria-live="polite">
+          <div className="loading-box">
+            <div className="loading-spinner" />
+            <p className="loading-title">{overlayCopy.title}</p>
+            <p className="loading-sub">{overlayCopy.sub}</p>
+          </div>
+        </div>
+      )}
     </Box>
   );
 }
