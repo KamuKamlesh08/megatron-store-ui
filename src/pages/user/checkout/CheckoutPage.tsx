@@ -26,6 +26,7 @@ import {
 
 import Header from "../common/Header";
 import "./CheckoutPage.css";
+import { appendOrder } from "../util/orders";
 
 type CartItem = {
   productId: string;
@@ -234,7 +235,7 @@ export default function CheckoutPage() {
     };
     sessionStorage.setItem("order:latest", JSON.stringify(savedOrder));
     localStorage.setItem("order:latest", JSON.stringify(savedOrder));
-
+    appendOrder(savedOrder);
     // ⏳ wait 5s, THEN clear cart + redirect
     setTimeout(() => {
       localStorage.removeItem("cart");

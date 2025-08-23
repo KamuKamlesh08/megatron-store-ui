@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate, Link as RouterLink } from "react-router-dom";
 import {
   Box,
@@ -11,7 +11,6 @@ import {
   Breadcrumbs,
   Link as MUILink,
   Stack,
-  IconButton,
   Snackbar,
   Alert,
   Card,
@@ -21,6 +20,8 @@ import "./ProductDetails.css";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import BoltIcon from "@mui/icons-material/Bolt";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 
 import useCity from "../../../hooks/useCity";
 
@@ -28,17 +29,17 @@ import {
   PRODUCTS,
   SUBCATEGORIES,
   CATEGORIES,
-  INVENTORY,
   OFFERS,
   USER,
   Product,
   Cart,
   CartItem,
   getInventoryStock,
-} from "../../../data/dummyData"; // adjust path to your dummyData file
-import ScrollableProducts from "../ScrollableProducts"; // adjust path if needed
+} from "../../../data/dummyData";
+import ScrollableProducts from "../ScrollableProducts";
 import Header from "../common/Header";
 import { writeCart } from "../util/cart";
+import { toggleWishlist, isInWishlist } from "../util/wishlist";
 
 function formatINR(n: number) {
   return `₹${n.toLocaleString("en-IN")}`;
@@ -77,12 +78,7 @@ export default function ProductDetails() {
     [subcategory]
   );
 
-  // Offers logic:
-  // - Price discount: prefer highest discount that applies
-  //   Applies if:
-  //     - offer.productId === product.id
-  //     - offer.categoryId === category.id
-  //     - OR (data has some categoryId like "c_mobiles") -> also treat subcategory id as category match
+  // Offers
   const { bestDiscountOffer, nonPriceOffers } = useMemo(() => {
     if (!product)
       return {
@@ -96,8 +92,8 @@ export default function ProductDetails() {
       const byCategory =
         o.categoryId && category?.id && o.categoryId === category.id;
       const bySubcatHack =
-        o.categoryId && subcategory?.id && o.categoryId === subcategory.id; // handles "c_mobiles" style ids in your data
-      const global = !o.categoryId && !o.productId; // e.g., free shipping
+        o.categoryId && subcategory?.id && o.categoryId === subcategory.id;
+      const global = !o.categoryId && !o.productId;
       return byProduct || byCategory || bySubcatHack || global;
     });
 
@@ -127,15 +123,7 @@ export default function ProductDetails() {
     };
   }, [product, bestDiscountOffer]);
 
-  // const stock = useMemo(() => {
-  //   if (!product) return 0;
-  //   const rec = INVENTORY.find(
-  //     (i) => i.productId === product.id && i.city === USER.city
-  //   );
-  //   return rec?.stock ?? 0;
-  // }, [product]);
-
-  // replace your current "stock" useMemo:
+  // Stock (city-aware)
   const stock = useMemo(() => {
     if (!product) return 0;
     return getInventoryStock(product.id, city);
@@ -155,6 +143,24 @@ export default function ProductDetails() {
     );
   }, [product]);
 
+  // ===== Wishlist state =====
+  const [wish, setWish] = useState(false);
+  useEffect(() => {
+    if (product?.id) setWish(isInWishlist(product.id));
+  }, [product?.id]);
+
+  const handleWishlist = () => {
+    if (!product) return;
+    const nowInWishlist = toggleWishlist(product.id);
+    setWish(nowInWishlist);
+    setSnack({
+      open: true,
+      msg: nowInWishlist ? "Added to wishlist" : "Removed from wishlist",
+      type: "success",
+    });
+  };
+
+  // ===== Cart actions =====
   const addToCart = (qty = 1) => {
     if (!product || !pricing) return;
     const raw = localStorage.getItem("cart");
@@ -170,19 +176,19 @@ export default function ProductDetails() {
     } else {
       cart.items.push({
         productId: product.id,
-        sku: product.sku,
+        // if you later use SKU-wise variants, push `sku` from product here
+        sku: (product as any).sku,
         quantity: qty,
         priceSnapshot: pricing.effective,
       });
     }
     writeCart(cart);
-    //localStorage.setItem("cart", JSON.stringify(cart));
     setSnack({ open: true, msg: "Added to cart!", type: "success" });
   };
 
   const buyNow = () => {
     addToCart(1);
-    navigate("/checkout"); // change if you use a different route
+    navigate("/checkout");
   };
 
   if (!product) {
@@ -204,6 +210,7 @@ export default function ProductDetails() {
       mx="auto"
     >
       <Header city={"Delhi"} onOpenLocation={() => console.log("test loc")} />
+
       {/* Breadcrumbs */}
       <Breadcrumbs className="pd-breadcrumbs" sx={{ mb: 2 }}>
         <MUILink
@@ -374,6 +381,7 @@ export default function ProductDetails() {
               >
                 Add to Cart
               </Button>
+
               <Button
                 className="btn-buy"
                 startIcon={<BoltIcon />}
@@ -384,6 +392,17 @@ export default function ProductDetails() {
                 sx={{ borderRadius: 2 }}
               >
                 Buy Now
+              </Button>
+
+              <Button
+                className={`btn-wish ${wish ? "active" : ""}`}
+                startIcon={wish ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+                variant={wish ? "contained" : "outlined"}
+                size="large"
+                onClick={handleWishlist}
+                sx={{ borderRadius: 2 }}
+              >
+                {wish ? "Wishlisted" : "Add to Wishlist"}
               </Button>
             </Stack>
 

@@ -1,0 +1,97 @@
+:root {
+  --ot-accent: #0077ff;
+  --ot-done: #00c896;
+  --ot-text: #111827;
+  --ot-muted: #6b7280;
+  --ot-line: #e5e7eb;
+  --ot-bg: #ffffff;
+}
+
+.ot-page .ot-panel {
+  background: var(--ot-bg);
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+/* Horizontal tracker */
+.ot-tracker {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  padding: 6px 2px 2px;
+}
+
+.ot-step {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+}
+.ot-step .ot-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: var(--ot-line);
+  border: 2px solid var(--ot-line);
+  z-index: 1;
+}
+.ot-step .ot-line {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  right: -50%;
+  height: 2px;
+  background: var(--ot-line);
+  z-index: 0;
+}
+.ot-step:last-child .ot-line {
+  display: none;
+}
+
+.ot-step .ot-label {
+  margin-left: 8px;
+  font-size: 12px;
+  color: var(--ot-muted);
+  white-space: nowrap;
+}
+
+/* states */
+.ot-step.done .ot-dot {
+  background: var(--ot-done);
+  border-color: var(--ot-done);
+}
+.ot-step.done .ot-line {
+  background: var(--ot-done);
+}
+.ot-step.done .ot-label {
+  color: var(--ot-text);
+  font-weight: 600;
+}
+
+.ot-step.current .ot-dot {
+  background: #fff;
+  border-color: var(--ot-accent);
+  box-shadow: 0 0 0 4px rgba(0, 119, 255, 0.15);
+}
+.ot-step.current .ot-label {
+  color: var(--ot-accent);
+  font-weight: 700;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .ot-step .ot-label {
+    font-size: 11px;
+  }
+}
+@media (max-width: 480px) {
+  .ot-step .ot-label {
+    display: none; /* keep a clean minimal look on tiny screens */
+  }
+  .ot-tracker {
+    gap: 4px;
+  }
+}

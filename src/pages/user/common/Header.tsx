@@ -4,50 +4,36 @@ import "./Header.css";
 import fallbackLogo from "../../../assets/logo-dark-bg.png";
 import wishlistIcon from "../../../assets/megatron-wishlist.png";
 import cartIcon from "../../../assets/megatron-cart.png";
+import ordersIcon from "../../../assets/megatron-orders.png";
 import { getCartCount } from "../util/cart";
-
-type CartItem = {
-  productId: string;
-  quantity?: number;
-  priceSnapshot?: number;
-};
+import { readWishlistIds } from "../util/wishlist"; // ✅ NEW
 
 type HeaderProps = {
-  city: string; // initial city (e.g., "Delhi")
-  onOpenLocation?: () => void; // kept for backwards-compat (unused internally)
+  city: string;
+  onOpenLocation?: () => void;
   logoSrc?: string;
-  onSearch?: (q: string) => void; // optional search handler
+  onSearch?: (q: string) => void;
 };
-
-/* ------- helpers ------- */
-// const getCartCount = () => {
-//   try {
-//     const raw = localStorage.getItem("cart");
-//     if (!raw) return 0;
-//     const cart = JSON.parse(raw) as { items?: CartItem[] };
-//     return (cart.items || []).reduce((s, it) => s + (it.quantity ?? 0), 0);
-//   } catch {
-//     return 0;
-//   }
-// };
 
 const Header: React.FC<HeaderProps> = ({ city, logoSrc, onSearch }) => {
   const navigate = useNavigate();
 
-  // UI state
   const [showMobileActions, setShowMobileActions] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [query, setQuery] = useState("");
 
-  // Location (shared across pages via localStorage + custom event)
   const [localCity, setLocalCity] = useState<string>(
     () => localStorage.getItem("city") || city
   );
   const [pincode, setPincode] = useState("");
 
-  // Cart count badge
+  // ✅ Counts
   const [cartCount, setCartCount] = useState<number>(getCartCount());
+  const [wishlistCount, setWishlistCount] = useState<number>(
+    readWishlistIds().length // ✅ initial
+  );
 
+  // cart count sync
   useEffect(() => {
     const syncCart = () => setCartCount(getCartCount());
     window.addEventListener("storage", syncCart);
@@ -64,13 +50,32 @@ const Header: React.FC<HeaderProps> = ({ city, logoSrc, onSearch }) => {
     };
   }, []);
 
-  // broadcast city changes
+  // ✅ wishlist count sync
+  useEffect(() => {
+    const syncWishlist = () => setWishlistCount(readWishlistIds().length);
+    // initial pull
+    syncWishlist();
+    window.addEventListener("storage", syncWishlist);
+    window.addEventListener(
+      "wishlist:updated",
+      syncWishlist as unknown as EventListener
+    );
+    return () => {
+      window.removeEventListener("storage", syncWishlist);
+      window.removeEventListener(
+        "wishlist:updated",
+        syncWishlist as unknown as EventListener
+      );
+    };
+  }, []);
+
+  // city broadcast
   useEffect(() => {
     localStorage.setItem("city", localCity);
     window.dispatchEvent(new Event("location:updated"));
   }, [localCity]);
 
-  // listen for city changes from other tabs/components
+  // city listen
   useEffect(() => {
     const syncCity = () => {
       const c = localStorage.getItem("city");
@@ -95,14 +100,17 @@ const Header: React.FC<HeaderProps> = ({ city, logoSrc, onSearch }) => {
     setShowMobileActions(false);
     navigate("/cart");
   };
-
-  const submitSearch = () => {
-    if (onSearch) onSearch(query);
-    // optional fallback route:
-    // else navigate(`/products?search=${encodeURIComponent(query)}`);
+  const goToWishlist = () => {
+    setShowMobileActions(false);
+    navigate("/wishlist");
+  };
+  const goToOrders = () => {
+    setShowMobileActions(false);
+    navigate("/orders");
   };
 
-  /* ---- Location popup actions ---- */
+  const submitSearch = () => onSearch?.(query);
+
   const openLocationPopup = () => setShowPopup(true);
   const applyPincode = () => {
     if (pincode.trim()) {
@@ -110,12 +118,9 @@ const Header: React.FC<HeaderProps> = ({ city, logoSrc, onSearch }) => {
       setShowPopup(false);
     }
   };
-
   const detectLocation = () => {
-    if (!("geolocation" in navigator)) {
-      alert("Geolocation not available on this device.");
-      return;
-    }
+    if (!("geolocation" in navigator))
+      return alert("Geolocation not available on this device.");
     navigator.geolocation.getCurrentPosition(
       async ({ coords }) => {
         try {
@@ -161,10 +166,30 @@ const Header: React.FC<HeaderProps> = ({ city, logoSrc, onSearch }) => {
         <div className="actions">
           {/* Desktop */}
           <div className="desktop-actions">
-            <span className="wishlist" role="button" aria-label="Wishlist">
+            {/* ✅ Wishlist with badge */}
+            <span
+              className="cart-icon-wrap wishlist" // reuse wrap for positioning
+              role="button"
+              aria-label="Wishlist"
+              onClick={goToWishlist}
+            >
               <img src={wishlistIcon} alt="Wishlist" className="icon-24" />
+              {wishlistCount > 0 && (
+                <span className="cart-badge">{wishlistCount}</span>
+              )}
             </span>
 
+            {/* Orders */}
+            <span
+              className="orders"
+              role="button"
+              aria-label="My Orders"
+              onClick={goToOrders}
+            >
+              <img src={ordersIcon} alt="My Orders" className="icon-24" />
+            </span>
+
+            {/* Cart */}
             <button
               className="cart-icon-wrap"
               onClick={goToCart}
@@ -182,9 +207,16 @@ const Header: React.FC<HeaderProps> = ({ city, logoSrc, onSearch }) => {
             </span>
             {showMobileActions && (
               <div className="mobile-actions-popup">
-                <span className="wishlist">
+                <span className="wishlist" onClick={goToWishlist}>
                   <img src={wishlistIcon} alt="Wishlist" className="icon-20" />
                   <span>Wishlist</span>
+                  {wishlistCount > 0 && (
+                    <em className="cart-badge-inline">{wishlistCount}</em>
+                  )}
+                </span>
+                <span className="orders" onClick={goToOrders}>
+                  <img src={ordersIcon} alt="My Orders" className="icon-20" />
+                  <span>My Orders</span>
                 </span>
                 <span className="cart" onClick={goToCart}>
                   <img src={cartIcon} alt="Cart" className="icon-20" />
@@ -199,7 +231,7 @@ const Header: React.FC<HeaderProps> = ({ city, logoSrc, onSearch }) => {
         </div>
       </div>
 
-      {/* Location Popup (CSS classes already present in your Header.css) */}
+      {/* Location Popup */}
       {showPopup && (
         <div className="location-popup">
           <div className="popup-content">

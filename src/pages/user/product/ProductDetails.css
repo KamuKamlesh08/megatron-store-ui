@@ -60,3 +60,18 @@
   color: #6b7280;
   text-decoration: line-through;
 }
+
+.btn-wish {
+  border-color: #e91e63 !important;
+  color: #e91e63 !important;
+}
+.btn-wish:hover {
+  background: #e91e63 !important;
+  color: #fff !important;
+  border-color: #e91e63 !important;
+}
+.btn-wish.active {
+  background: #e91e63 !important;
+  color: #fff !important;
+  border-color: #e91e63 !important;
+}

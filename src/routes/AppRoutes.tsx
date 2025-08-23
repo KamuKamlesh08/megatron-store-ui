@@ -13,6 +13,10 @@ import CartPage from "pages/user/cart/CartPage";
 import CheckoutPage from "pages/user/checkout/CheckoutPage";
 import OrderSuccess from "pages/user/order/OrderSuccess";
 import ScrollToTop from "components/ScrollToTop";
+import OrdersPage from "pages/user/order/OrdersPage";
+import OrderDetailPage from "pages/user/order/OrderDetailPage";
+import WishlistPage from "pages/user/wishlist/WishlistPage";
+import OrderTrackingPage from "pages/user/order/OrderTrackingPage";
 
 const AppRoutes = () => {
   return (
@@ -30,6 +34,10 @@ const AppRoutes = () => {
         <Route path="/product/:id" element={<ProductDetails />} />
         // routes
         <Route path="/order/success" element={<OrderSuccess />} />
+        <Route path="/orders" element={<OrdersPage />} />
+        <Route path="/orders/:id" element={<OrderDetailPage />} />
+        <Route path="/wishlist" element={<WishlistPage />} />
+        <Route path="/orders/track/:id" element={<OrderTrackingPage />} />
         <Route
           path="/cart"
           element={
