@@ -47,35 +47,6 @@
   color: #fff;
 }
 
-/* Search bar */
-.search-bar {
-  flex: 1;
-  display: flex;
-  margin: 0 20px;
-  max-width: 600px;
-}
-.search-bar input {
-  flex: 1;
-  padding: 10px 14px;
-  border: none;
-  border-radius: 6px 0 0 6px;
-  outline: none;
-  font-size: 15px;
-}
-.search-bar button {
-  background: var(--primary);
-  border: none;
-  padding: 10px 16px;
-  border-radius: 0 6px 6px 0;
-  cursor: pointer;
-  font-size: 16px;
-  color: #fff;
-  transition: 0.2s;
-}
-.search-bar button:hover {
-  background: var(--accent);
-}
-
 /* Right actions */
 .actions {
   display: flex;
@@ -132,7 +103,7 @@
   color: var(--accent);
 }
 
-/* Cart badge */
+/* Cart/Wishlist badge */
 .cart-icon-wrap {
   position: relative;
   display: inline-flex;
@@ -190,7 +161,14 @@
   gap: 8px;
 }
 
-/* 🔁 Mobile layout override */
+/* NOTE:
+   Search input/button styling lives in SearchBox.css.
+   Yahan sirf layout ke liye grid-area assign karte hain. */
+.search-bar {
+  grid-area: search;
+}
+
+/* 🔁 Mobile layout */
 @media (max-width: 768px) {
   /* 2-row layout: top row (left + actions), second row (search) */
   .header {
@@ -211,10 +189,9 @@
     justify-self: end;
     display: flex;
     align-items: center;
-    gap: 12px; /* tighter on mobile */
+    gap: 12px;
   }
   .search-bar {
-    grid-area: search;
     width: 100%;
     max-width: 100%;
     margin: 6px 0 0 0;
@@ -226,7 +203,7 @@
     align-items: center;
     gap: 12px;
   }
-  /* Hide wishlist on mobile header bar (still in menu) */
+  /* Hide wishlist icon on top bar (still in menu) */
   .desktop-actions .wishlist {
     display: none;
   }
@@ -241,22 +218,7 @@
     height: 72px;
   }
 
-  /* Search tweaks */
-  .search-bar input {
-    font-size: 14px;
-    padding: 9px 12px;
-  }
-  .search-bar button {
-    padding: 9px 14px;
-    font-size: 14px;
-  }
-
-  /* Popup position */
-  .mobile-actions-popup {
-    top: 34px;
-  }
-
-  /* Tap targets for header icons */
+  /* Tap targets */
   .desktop-actions > span,
   .desktop-actions > button.cart-icon-wrap {
     display: inline-flex;
@@ -268,18 +230,15 @@
     border-radius: 8px;
   }
 
-  /* Slightly smaller bitmaps—sharper on dense screens */
   .icon-24 {
     width: 22px;
     height: 22px;
   }
 
-  /* Hamburger size */
   .mobile-menu-icon {
     font-size: 22px;
   }
 
-  /* Badge tighter on mobile */
   .cart-badge {
     top: -4px;
     right: -6px;
@@ -289,7 +248,6 @@
     font-size: 11px;
   }
 
-  /* Popup list readability */
   .mobile-actions-popup span {
     display: flex;
     align-items: center;
@@ -301,7 +259,6 @@
     height: 18px;
   }
 
-  /* Location button tighter */
   .location-btn {
     font-size: 13px;
     padding: 6px 10px;
@@ -312,9 +269,7 @@
   }
 }
 
-/* =========================
-   XS phones (≤360px)
-   ========================= */
+/* XS phones (≤360px) */
 @media (max-width: 360px) {
   .logo img {
     height: 56px;
@@ -329,14 +284,6 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-  }
-  .search-bar input {
-    font-size: 13px;
-    padding: 8px 10px;
-  }
-  .search-bar button {
-    padding: 8px 12px;
-    font-size: 13px;
   }
   .desktop-actions > span,
   .desktop-actions > button.cart-icon-wrap {
@@ -353,9 +300,7 @@
   }
 }
 
-/* =========================
-   Small phones (361–480px)
-   ========================= */
+/* Small phones (361–480px) */
 @media (min-width: 361px) and (max-width: 480px) {
   .logo img {
     height: 64px;
@@ -366,13 +311,6 @@
   .location-btn {
     font-size: 13px;
     padding: 7px 12px;
-  }
-  .search-bar input {
-    font-size: 14px;
-  }
-  .search-bar button {
-    font-size: 14px;
-    padding: 9px 13px;
   }
   .desktop-actions > span,
   .desktop-actions > button.cart-icon-wrap {
@@ -386,9 +324,7 @@
   }
 }
 
-/* =========================
-   Large phones / Phablets (481–640px)
-   ========================= */
+/* Large phones / Phablets (481–640px) */
 @media (min-width: 481px) and (max-width: 640px) {
   .logo img {
     height: 68px;
@@ -396,21 +332,9 @@
   .header {
     padding: 10px 14px;
   }
-  .search-bar {
-    max-width: 100%;
-  }
-  .search-bar input {
-    font-size: 14px;
-    padding: 10px 12px;
-  }
-  .search-bar button {
-    padding: 10px 14px;
-  }
 }
 
-/* =========================
-   Tablets portrait/landscape (769–1024px)
-   ========================= */
+/* Tablets (769–1024px) */
 @media (min-width: 769px) and (max-width: 1024px) {
   .header {
     padding: 10px 18px;
@@ -418,22 +342,13 @@
   .logo img {
     height: 90px;
   }
-  .search-bar {
-    max-width: 520px;
-    margin: 0 16px;
-  }
-  .location-btn {
-    padding: 8px 14px;
-  }
   .icon-24 {
     width: 22px;
     height: 22px;
   }
 }
 
-/* =========================
-   Small laptops (1025–1280px)
-   ========================= */
+/* Small laptops (1025–1280px) */
 @media (min-width: 1025px) and (max-width: 1280px) {
   .header {
     padding: 12px 24px;
@@ -441,18 +356,9 @@
   .logo img {
     height: 100px;
   }
-  .search-bar {
-    max-width: 680px;
-  }
-  .icon-24 {
-    width: 24px;
-    height: 24px;
-  }
 }
 
-/* =========================
-   Desktops (1281–1536px)
-   ========================= */
+/* Desktops (1281–1536px) */
 @media (min-width: 1281px) and (max-width: 1536px) {
   .header {
     padding: 12px 28px;
@@ -460,30 +366,19 @@
   .logo img {
     height: 110px;
   }
-  .search-bar {
-    max-width: 780px;
-  }
-  .location-btn {
-    padding: 9px 18px;
-  }
   .cart-badge {
     top: -7px;
     right: -10px;
   }
 }
 
-/* =========================
-   Large screens / 2K+ (≥1537px)
-   ========================= */
+/* Large screens / 2K+ (≥1537px) */
 @media (min-width: 1537px) {
   .header {
     padding: 16px 40px;
   }
   .logo img {
     height: 120px;
-  }
-  .search-bar {
-    max-width: 920px;
   }
   .icon-24 {
     width: 26px;
@@ -495,9 +390,7 @@
   }
 }
 
-/* =========================
-   Short landscape (e.g., phones sideways)
-   ========================= */
+/* Short landscape (phones sideways) */
 @media (max-height: 420px) and (orientation: landscape) {
   .header {
     padding: 6px 10px;
@@ -505,15 +398,9 @@
   .logo img {
     height: 56px;
   }
-  .search-bar {
-    margin: 4px 0 0 0;
-  }
-  .search-bar input {
-    padding: 8px 10px;
-  }
 }
 
-/* ===== Location Popup (shared with Home) ===== */
+/* ===== Location Popup ===== */
 .location-popup {
   position: fixed;
   inset: 0;

@@ -6,11 +6,12 @@ import wishlistIcon from "../../../assets/megatron-wishlist.png";
 import cartIcon from "../../../assets/megatron-cart.png";
 import ordersIcon from "../../../assets/megatron-orders.png";
 import { getCartCount } from "../util/cart";
-import { readWishlistIds } from "../util/wishlist"; // ✅ NEW
+import { readWishlistIds } from "../util/wishlist";
+import SearchBox from "./SearchBox";
 
 type HeaderProps = {
   city: string;
-  onOpenLocation?: () => void;
+  onOpenLocation?: () => void; // kept for compat (unused)
   logoSrc?: string;
   onSearch?: (q: string) => void;
 };
@@ -18,83 +19,69 @@ type HeaderProps = {
 const Header: React.FC<HeaderProps> = ({ city, logoSrc, onSearch }) => {
   const navigate = useNavigate();
 
+  // UI
   const [showMobileActions, setShowMobileActions] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
-  const [query, setQuery] = useState("");
 
+  // Location
   const [localCity, setLocalCity] = useState<string>(
     () => localStorage.getItem("city") || city
   );
   const [pincode, setPincode] = useState("");
 
-  // ✅ Counts
+  // Badges
   const [cartCount, setCartCount] = useState<number>(getCartCount());
   const [wishlistCount, setWishlistCount] = useState<number>(
-    readWishlistIds().length // ✅ initial
+    readWishlistIds().length
   );
 
-  // cart count sync
+  // Cart count sync
   useEffect(() => {
     const syncCart = () => setCartCount(getCartCount());
     window.addEventListener("storage", syncCart);
-    window.addEventListener(
-      "cart:updated",
-      syncCart as unknown as EventListener
-    );
+    window.addEventListener("cart:updated", syncCart as EventListener);
     return () => {
       window.removeEventListener("storage", syncCart);
-      window.removeEventListener(
-        "cart:updated",
-        syncCart as unknown as EventListener
-      );
+      window.removeEventListener("cart:updated", syncCart as EventListener);
     };
   }, []);
 
-  // ✅ wishlist count sync
+  // Wishlist count sync
   useEffect(() => {
     const syncWishlist = () => setWishlistCount(readWishlistIds().length);
-    // initial pull
     syncWishlist();
     window.addEventListener("storage", syncWishlist);
-    window.addEventListener(
-      "wishlist:updated",
-      syncWishlist as unknown as EventListener
-    );
+    window.addEventListener("wishlist:updated", syncWishlist as EventListener);
     return () => {
       window.removeEventListener("storage", syncWishlist);
       window.removeEventListener(
         "wishlist:updated",
-        syncWishlist as unknown as EventListener
+        syncWishlist as EventListener
       );
     };
   }, []);
 
-  // city broadcast
+  // City broadcast
   useEffect(() => {
     localStorage.setItem("city", localCity);
     window.dispatchEvent(new Event("location:updated"));
   }, [localCity]);
 
-  // city listen
+  // City listen
   useEffect(() => {
     const syncCity = () => {
       const c = localStorage.getItem("city");
       if (c && c !== localCity) setLocalCity(c);
     };
-    window.addEventListener(
-      "location:updated",
-      syncCity as unknown as EventListener
-    );
+    window.addEventListener("location:updated", syncCity as EventListener);
     window.addEventListener("storage", syncCity);
     return () => {
-      window.removeEventListener(
-        "location:updated",
-        syncCity as unknown as EventListener
-      );
+      window.removeEventListener("location:updated", syncCity as EventListener);
       window.removeEventListener("storage", syncCity);
     };
   }, [localCity]);
 
+  // Nav
   const toggleMobileActions = () => setShowMobileActions((s) => !s);
   const goToCart = () => {
     setShowMobileActions(false);
@@ -109,18 +96,20 @@ const Header: React.FC<HeaderProps> = ({ city, logoSrc, onSearch }) => {
     navigate("/orders");
   };
 
-  const submitSearch = () => onSearch?.(query);
-
+  // Location popup
   const openLocationPopup = () => setShowPopup(true);
   const applyPincode = () => {
-    if (pincode.trim()) {
-      setLocalCity(pincode.trim());
+    const v = pincode.trim();
+    if (v) {
+      setLocalCity(v);
       setShowPopup(false);
     }
   };
   const detectLocation = () => {
-    if (!("geolocation" in navigator))
-      return alert("Geolocation not available on this device.");
+    if (!("geolocation" in navigator)) {
+      alert("Geolocation not available on this device.");
+      return;
+    }
     navigator.geolocation.getCurrentPosition(
       async ({ coords }) => {
         try {
@@ -153,22 +142,14 @@ const Header: React.FC<HeaderProps> = ({ city, logoSrc, onSearch }) => {
           </button>
         </div>
 
-        <div className="search-bar">
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && submitSearch()}
-            placeholder={`Search in ${localCity}: mobiles, shoes...`}
-          />
-          <button onClick={submitSearch}>🔎</button>
-        </div>
+        {/* Central search (scoped + autosuggest) */}
+        <SearchBox city={localCity} onSearch={onSearch} />
 
         <div className="actions">
           {/* Desktop */}
           <div className="desktop-actions">
-            {/* ✅ Wishlist with badge */}
             <span
-              className="cart-icon-wrap wishlist" // reuse wrap for positioning
+              className="cart-icon-wrap wishlist"
               role="button"
               aria-label="Wishlist"
               onClick={goToWishlist}
@@ -179,7 +160,6 @@ const Header: React.FC<HeaderProps> = ({ city, logoSrc, onSearch }) => {
               )}
             </span>
 
-            {/* Orders */}
             <span
               className="orders"
               role="button"
@@ -189,7 +169,6 @@ const Header: React.FC<HeaderProps> = ({ city, logoSrc, onSearch }) => {
               <img src={ordersIcon} alt="My Orders" className="icon-24" />
             </span>
 
-            {/* Cart */}
             <button
               className="cart-icon-wrap"
               onClick={goToCart}

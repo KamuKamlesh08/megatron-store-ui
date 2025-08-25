@@ -1,0 +1,222 @@
+/* =========================
+   SearchBox — unified control
+   ========================= */
+
+.search-bar {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+}
+
+/* ===== Left: scope (All / Category) ===== */
+.scope-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.scope-btn {
+  border: 1px solid #e5e7eb;
+  border-right: none;
+  background: #fff;
+  color: #111827;
+  padding: 10px 12px;
+  border-radius: 6px 0 0 6px;
+  cursor: pointer;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.scope-btn .chev {
+  opacity: 0.75;
+}
+
+.scope-menu {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 6px);
+  min-width: 200px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.12);
+  z-index: 600;
+  overflow: hidden;
+}
+
+button.scope-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  background: transparent;
+  color: #080f0f;
+  font-size: 14px;
+  cursor: pointer;
+  border: 0;
+  border-bottom: 1px solid #eee;
+  border-radius: 0;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+button.scope-item:last-child {
+  border-bottom: 0;
+}
+button.scope-item:hover,
+button.scope-item:focus-visible {
+  background-color: rgba(0, 200, 150, 0.08);
+  outline: none;
+}
+button.scope-item:active {
+  background-color: rgba(0, 200, 150, 0.14);
+}
+button.scope-item.sel {
+  font-weight: 700;
+  background-color: rgba(0, 200, 150, 0.1);
+}
+
+@supports (color: color-mix(in srgb, white, black)) {
+  button.scope-item:hover,
+  button.scope-item:focus-visible {
+    background-color: color-mix(in srgb, var(--accent, #00c896) 10%, #fff);
+  }
+}
+
+.scope-thumb {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  border-radius: 4px;
+  object-fit: cover;
+  user-select: none;
+  -webkit-user-drag: none;
+  opacity: 0.95;
+}
+.scope-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ===== Middle: input (suggestions attach here) ===== */
+.input-wrap {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+}
+
+.input-wrap > input,
+.search-bar input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid #e5e7eb;
+  border-left: none;
+  border-right: none;
+  border-radius: 0;
+  outline: none;
+  font-size: 15px;
+}
+
+.search-suggest {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: none;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  display: none;
+  max-height: 280px;
+  overflow-y: auto;
+  z-index: 500;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+.search-suggest.open {
+  display: block;
+}
+
+/* Suggest rows (with tiny image) */
+.suggest-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  color: #080f0f;
+  font-size: 15px;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #eee;
+  border-radius: 0;
+  cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+.suggest-item:last-child {
+  border-bottom: 0;
+}
+.suggest-item:hover,
+.suggest-item.active,
+.suggest-item:focus-visible {
+  background-color: #f9fafb;
+  outline: none;
+}
+
+@supports (color: color-mix(in srgb, white, black)) {
+  .suggest-item:hover,
+  .suggest-item.active,
+  .suggest-item:focus-visible {
+    background-color: color-mix(in srgb, var(--accent, #00c896) 8%, #fff);
+  }
+}
+
+.suggest-thumb {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  border-radius: 6px;
+  object-fit: cover;
+  user-select: none;
+  -webkit-user-drag: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+.suggest-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ===== Right: search button ===== */
+.search-btn {
+  background: var(--primary, #0077ff);
+  border: 1px solid var(--primary, #0077ff);
+  padding: 10px 12px;
+  border-radius: 0 6px 6px 0;
+  cursor: pointer;
+  font-size: 16px;
+  color: #fff;
+  transition: 0.15s;
+}
+.search-btn:hover {
+  background: var(--accent, #00c896);
+  border-color: var(--accent, #00c896);
+}
+
+/* ===== Mobile tweaks ===== */
+@media (max-width: 768px) {
+  .input-wrap > input {
+    font-size: 14px;
+    padding: 9px 12px;
+  }
+  .search-suggest {
+    max-height: 220px;
+  }
+  .suggest-item {
+    padding: 10px;
+    font-size: 13px;
+  }
+}

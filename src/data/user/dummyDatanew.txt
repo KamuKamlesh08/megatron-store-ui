@@ -31,7 +31,7 @@ export interface Product {
 export interface Inventory {
   id: string;
   productId: string; // keep for joins
-  sku: string; // ✅ inventory keyed by sku + city
+  sku: string;       // ✅ inventory keyed by sku + city
   city: string;
   stock: number;
 }
@@ -50,7 +50,7 @@ export interface Offer {
 
 export interface CartItem {
   productId: string; // keep
-  sku: string; // ✅ REQUIRED
+  sku: string;       // ✅ REQUIRED
   quantity: number;
   priceSnapshot: number;
 }
@@ -64,7 +64,7 @@ export interface Cart {
 
 export interface OrderItem {
   productId: string; // keep
-  sku: string; // ✅ REQUIRED
+  sku: string;       // ✅ REQUIRED
   quantity: number;
   price: number;
 }
@@ -175,312 +175,60 @@ export const PRODUCTS: Product[] = [
 // ===== INVENTORY (sku + city) =====
 export const INVENTORY: Inventory[] = [
   // Delhi
-  {
-    id: "inv1",
-    productId: "p_iphone15",
-    sku: "IPH-15-128-BLK",
-    city: "Delhi",
-    stock: 20,
-  },
-  {
-    id: "inv2",
-    productId: "p_samsung_s23",
-    sku: "SAM-S23-128-GRN",
-    city: "Delhi",
-    stock: 15,
-  },
-  {
-    id: "inv3",
-    productId: "p_dell_xps",
-    sku: "DEL-XPS13-16-512-SLV",
-    city: "Delhi",
-    stock: 5,
-  },
-  {
-    id: "inv4",
-    productId: "p_kurta",
-    sku: "KUR-MEN-CTN-ONION",
-    city: "Delhi",
-    stock: 50,
-  },
-  {
-    id: "inv5",
-    productId: "p_georgette_saree",
-    sku: "SAR-GEO-BOL-WHT-001",
-    city: "Delhi",
-    stock: 24,
-  },
-  {
-    id: "inv6",
-    productId: "p_jwel_set",
-    sku: "JW-ALY-GLD-SET-001",
-    city: "Delhi",
-    stock: 35,
-  },
+  { id: "inv1", productId: "p_iphone15", sku: "IPH-15-128-BLK", city: "Delhi", stock: 20 },
+  { id: "inv2", productId: "p_samsung_s23", sku: "SAM-S23-128-GRN", city: "Delhi", stock: 15 },
+  { id: "inv3", productId: "p_dell_xps", sku: "DEL-XPS13-16-512-SLV", city: "Delhi", stock: 5 },
+  { id: "inv4", productId: "p_kurta", sku: "KUR-MEN-CTN-ONION", city: "Delhi", stock: 50 },
+  { id: "inv5", productId: "p_georgette_saree", sku: "SAR-GEO-BOL-WHT-001", city: "Delhi", stock: 24 },
+  { id: "inv6", productId: "p_jwel_set", sku: "JW-ALY-GLD-SET-001", city: "Delhi", stock: 35 },
 
   // Mumbai
-  {
-    id: "inv7",
-    productId: "p_iphone15",
-    sku: "IPH-15-128-BLK",
-    city: "Mumbai",
-    stock: 12,
-  },
-  {
-    id: "inv8",
-    productId: "p_samsung_s23",
-    sku: "SAM-S23-128-GRN",
-    city: "Mumbai",
-    stock: 9,
-  },
-  {
-    id: "inv9",
-    productId: "p_dell_xps",
-    sku: "DEL-XPS13-16-512-SLV",
-    city: "Mumbai",
-    stock: 3,
-  },
-  {
-    id: "inv10",
-    productId: "p_kurta",
-    sku: "KUR-MEN-CTN-ONION",
-    city: "Mumbai",
-    stock: 22,
-  },
-  {
-    id: "inv11",
-    productId: "p_georgette_saree",
-    sku: "SAR-GEO-BOL-WHT-001",
-    city: "Mumbai",
-    stock: 18,
-  },
-  {
-    id: "inv12",
-    productId: "p_jwel_set",
-    sku: "JW-ALY-GLD-SET-001",
-    city: "Mumbai",
-    stock: 28,
-  },
+  { id: "inv7", productId: "p_iphone15", sku: "IPH-15-128-BLK", city: "Mumbai", stock: 12 },
+  { id: "inv8", productId: "p_samsung_s23", sku: "SAM-S23-128-GRN", city: "Mumbai", stock: 9 },
+  { id: "inv9", productId: "p_dell_xps", sku: "DEL-XPS13-16-512-SLV", city: "Mumbai", stock: 3 },
+  { id: "inv10", productId: "p_kurta", sku: "KUR-MEN-CTN-ONION", city: "Mumbai", stock: 22 },
+  { id: "inv11", productId: "p_georgette_saree", sku: "SAR-GEO-BOL-WHT-001", city: "Mumbai", stock: 18 },
+  { id: "inv12", productId: "p_jwel_set", sku: "JW-ALY-GLD-SET-001", city: "Mumbai", stock: 28 },
 
   // Bengaluru
-  {
-    id: "inv13",
-    productId: "p_iphone15",
-    sku: "IPH-15-128-BLK",
-    city: "Bengaluru",
-    stock: 16,
-  },
-  {
-    id: "inv14",
-    productId: "p_samsung_s23",
-    sku: "SAM-S23-128-GRN",
-    city: "Bengaluru",
-    stock: 11,
-  },
-  {
-    id: "inv15",
-    productId: "p_dell_xps",
-    sku: "DEL-XPS13-16-512-SLV",
-    city: "Bengaluru",
-    stock: 4,
-  },
-  {
-    id: "inv16",
-    productId: "p_kurta",
-    sku: "KUR-MEN-CTN-ONION",
-    city: "Bengaluru",
-    stock: 32,
-  },
-  {
-    id: "inv17",
-    productId: "p_georgette_saree",
-    sku: "SAR-GEO-BOL-WHT-001",
-    city: "Bengaluru",
-    stock: 20,
-  },
-  {
-    id: "inv18",
-    productId: "p_jwel_set",
-    sku: "JW-ALY-GLD-SET-001",
-    city: "Bengaluru",
-    stock: 26,
-  },
+  { id: "inv13", productId: "p_iphone15", sku: "IPH-15-128-BLK", city: "Bengaluru", stock: 16 },
+  { id: "inv14", productId: "p_samsung_s23", sku: "SAM-S23-128-GRN", city: "Bengaluru", stock: 11 },
+  { id: "inv15", productId: "p_dell_xps", sku: "DEL-XPS13-16-512-SLV", city: "Bengaluru", stock: 4 },
+  { id: "inv16", productId: "p_kurta", sku: "KUR-MEN-CTN-ONION", city: "Bengaluru", stock: 32 },
+  { id: "inv17", productId: "p_georgette_saree", sku: "SAR-GEO-BOL-WHT-001", city: "Bengaluru", stock: 20 },
+  { id: "inv18", productId: "p_jwel_set", sku: "JW-ALY-GLD-SET-001", city: "Bengaluru", stock: 26 },
 
   // Kolkata
-  {
-    id: "inv19",
-    productId: "p_iphone15",
-    sku: "IPH-15-128-BLK",
-    city: "Kolkata",
-    stock: 8,
-  },
-  {
-    id: "inv20",
-    productId: "p_samsung_s23",
-    sku: "SAM-S23-128-GRN",
-    city: "Kolkata",
-    stock: 7,
-  },
-  {
-    id: "inv21",
-    productId: "p_dell_xps",
-    sku: "DEL-XPS13-16-512-SLV",
-    city: "Kolkata",
-    stock: 2,
-  },
-  {
-    id: "inv22",
-    productId: "p_kurta",
-    sku: "KUR-MEN-CTN-ONION",
-    city: "Kolkata",
-    stock: 18,
-  },
-  {
-    id: "inv23",
-    productId: "p_georgette_saree",
-    sku: "SAR-GEO-BOL-WHT-001",
-    city: "Kolkata",
-    stock: 12,
-  },
-  {
-    id: "inv24",
-    productId: "p_jwel_set",
-    sku: "JW-ALY-GLD-SET-001",
-    city: "Kolkata",
-    stock: 16,
-  },
+  { id: "inv19", productId: "p_iphone15", sku: "IPH-15-128-BLK", city: "Kolkata", stock: 8 },
+  { id: "inv20", productId: "p_samsung_s23", sku: "SAM-S23-128-GRN", city: "Kolkata", stock: 7 },
+  { id: "inv21", productId: "p_dell_xps", sku: "DEL-XPS13-16-512-SLV", city: "Kolkata", stock: 2 },
+  { id: "inv22", productId: "p_kurta", sku: "KUR-MEN-CTN-ONION", city: "Kolkata", stock: 18 },
+  { id: "inv23", productId: "p_georgette_saree", sku: "SAR-GEO-BOL-WHT-001", city: "Kolkata", stock: 12 },
+  { id: "inv24", productId: "p_jwel_set", sku: "JW-ALY-GLD-SET-001", city: "Kolkata", stock: 16 },
 
   // Dehradun
-  {
-    id: "inv25",
-    productId: "p_iphone15",
-    sku: "IPH-15-128-BLK",
-    city: "Dehradun",
-    stock: 89,
-  },
-  {
-    id: "inv26",
-    productId: "p_samsung_s23",
-    sku: "SAM-S23-128-GRN",
-    city: "Dehradun",
-    stock: 17,
-  },
-  {
-    id: "inv27",
-    productId: "p_dell_xps",
-    sku: "DEL-XPS13-16-512-SLV",
-    city: "Dehradun",
-    stock: 10,
-  },
-  {
-    id: "inv28",
-    productId: "p_kurta",
-    sku: "KUR-MEN-CTN-ONION",
-    city: "Dehradun",
-    stock: 8,
-  },
-  {
-    id: "inv29",
-    productId: "p_georgette_saree",
-    sku: "SAR-GEO-BOL-WHT-001",
-    city: "Dehradun",
-    stock: 2,
-  },
-  {
-    id: "inv30",
-    productId: "p_jwel_set",
-    sku: "JW-ALY-GLD-SET-001",
-    city: "Dehradun",
-    stock: 16,
-  },
+  { id: "inv25", productId: "p_iphone15", sku: "IPH-15-128-BLK", city: "Dehradun", stock: 89 },
+  { id: "inv26", productId: "p_samsung_s23", sku: "SAM-S23-128-GRN", city: "Dehradun", stock: 17 },
+  { id: "inv27", productId: "p_dell_xps", sku: "DEL-XPS13-16-512-SLV", city: "Dehradun", stock: 10 },
+  { id: "inv28", productId: "p_kurta", sku: "KUR-MEN-CTN-ONION", city: "Dehradun", stock: 8 },
+  { id: "inv29", productId: "p_georgette_saree", sku: "SAR-GEO-BOL-WHT-001", city: "Dehradun", stock: 2 },
+  { id: "inv30", productId: "p_jwel_set", sku: "JW-ALY-GLD-SET-001", city: "Dehradun", stock: 16 },
 
   // Gurugram
-  {
-    id: "inv31",
-    productId: "p_iphone15",
-    sku: "IPH-15-128-BLK",
-    city: "Gurugram",
-    stock: 79,
-  },
-  {
-    id: "inv32",
-    productId: "p_samsung_s23",
-    sku: "SAM-S23-128-GRN",
-    city: "Gurugram",
-    stock: 37,
-  },
-  {
-    id: "inv33",
-    productId: "p_dell_xps",
-    sku: "DEL-XPS13-16-512-SLV",
-    city: "Gurugram",
-    stock: 18,
-  },
-  {
-    id: "inv34",
-    productId: "p_kurta",
-    sku: "KUR-MEN-CTN-ONION",
-    city: "Gurugram",
-    stock: 34,
-  },
-  {
-    id: "inv35",
-    productId: "p_georgette_saree",
-    sku: "SAR-GEO-BOL-WHT-001",
-    city: "Gurugram",
-    stock: 76,
-  },
-  {
-    id: "inv36",
-    productId: "p_jwel_set",
-    sku: "JW-ALY-GLD-SET-001",
-    city: "Gurugram",
-    stock: 6,
-  },
+  { id: "inv31", productId: "p_iphone15", sku: "IPH-15-128-BLK", city: "Gurugram", stock: 79 },
+  { id: "inv32", productId: "p_samsung_s23", sku: "SAM-S23-128-GRN", city: "Gurugram", stock: 37 },
+  { id: "inv33", productId: "p_dell_xps", sku: "DEL-XPS13-16-512-SLV", city: "Gurugram", stock: 18 },
+  { id: "inv34", productId: "p_kurta", sku: "KUR-MEN-CTN-ONION", city: "Gurugram", stock: 34 },
+  { id: "inv35", productId: "p_georgette_saree", sku: "SAR-GEO-BOL-WHT-001", city: "Gurugram", stock: 76 },
+  { id: "inv36", productId: "p_jwel_set", sku: "JW-ALY-GLD-SET-001", city: "Gurugram", stock: 6 },
 
   // Noida
-  {
-    id: "inv37",
-    productId: "p_iphone15",
-    sku: "IPH-15-128-BLK",
-    city: "Noida",
-    stock: 109,
-  },
-  {
-    id: "inv38",
-    productId: "p_samsung_s23",
-    sku: "SAM-S23-128-GRN",
-    city: "Noida",
-    stock: 117,
-  },
-  {
-    id: "inv39",
-    productId: "p_dell_xps",
-    sku: "DEL-XPS13-16-512-SLV",
-    city: "Noida",
-    stock: 210,
-  },
-  {
-    id: "inv40",
-    productId: "p_kurta",
-    sku: "KUR-MEN-CTN-ONION",
-    city: "Noida",
-    stock: 48,
-  },
-  {
-    id: "inv41",
-    productId: "p_georgette_saree",
-    sku: "SAR-GEO-BOL-WHT-001",
-    city: "Noida",
-    stock: 29,
-  },
-  {
-    id: "inv42",
-    productId: "p_jwel_set",
-    sku: "JW-ALY-GLD-SET-001",
-    city: "Noida",
-    stock: 161,
-  },
+  { id: "inv37", productId: "p_iphone15", sku: "IPH-15-128-BLK", city: "Noida", stock: 109 },
+  { id: "inv38", productId: "p_samsung_s23", sku: "SAM-S23-128-GRN", city: "Noida", stock: 117 },
+  { id: "inv39", productId: "p_dell_xps", sku: "DEL-XPS13-16-512-SLV", city: "Noida", stock: 210 },
+  { id: "inv40", productId: "p_kurta", sku: "KUR-MEN-CTN-ONION", city: "Noida", stock: 48 },
+  { id: "inv41", productId: "p_georgette_saree", sku: "SAR-GEO-BOL-WHT-001", city: "Noida", stock: 29 },
+  { id: "inv42", productId: "p_jwel_set", sku: "JW-ALY-GLD-SET-001", city: "Noida", stock: 161 },
 ];
 
 // ===== OFFERS (unchanged) =====
@@ -563,18 +311,8 @@ export const SAMPLE_CART: Cart = {
   id: "cart1",
   userId: USER.id,
   items: [
-    {
-      productId: "p_iphone15",
-      sku: "IPH-15-128-BLK",
-      quantity: 1,
-      priceSnapshot: 79999,
-    },
-    {
-      productId: "p_kurta",
-      sku: "KUR-MEN-CTN-ONION",
-      quantity: 2,
-      priceSnapshot: 2499,
-    },
+    { productId: "p_iphone15", sku: "IPH-15-128-BLK", quantity: 1, priceSnapshot: 79999 },
+    { productId: "p_kurta", sku: "KUR-MEN-CTN-ONION", quantity: 2, priceSnapshot: 2499 },
   ],
   status: "active",
 };
@@ -586,14 +324,7 @@ export const ORDERS: Order[] = [
     totalAmount: 71999,
     orderDate: new Date().toISOString(),
     status: "confirmed",
-    items: [
-      {
-        productId: "p_iphone15",
-        sku: "IPH-15-128-BLK",
-        quantity: 1,
-        price: 71999,
-      },
-    ],
+    items: [{ productId: "p_iphone15", sku: "IPH-15-128-BLK", quantity: 1, price: 71999 }],
   },
 ];
 
@@ -616,8 +347,7 @@ export function getInventoryStock(productId: string, city?: string): number {
 export function getInventoryStockBySku(sku: string, city?: string): number {
   const c = (city || getCurrentCity()).toLowerCase();
   const rec = INVENTORY.find(
-    (i) =>
-      i.sku.toLowerCase() === sku.toLowerCase() && i.city.toLowerCase() === c
+    (i) => i.sku.toLowerCase() === sku.toLowerCase() && i.city.toLowerCase() === c
   );
   return rec?.stock ?? 0;
 }
@@ -635,9 +365,9 @@ export interface VariantSku {
   sku: string;
   productId: string;
   attrs: Record<string, string>; // e.g., { Color: "Pink", Storage: "128GB" }
-  price: number; // effective price of this variant
-  mrp?: number; // optional MRP
-  image?: string; // variant image
+  price: number;                  // effective price of this variant
+  mrp?: number;                   // optional MRP
+  image?: string;                 // variant image
 }
 
 export const PRODUCT_SKUS: VariantSku[] = [
@@ -691,7 +421,7 @@ export interface Coupon {
   includeSkus?: string[];
   excludeCities?: string[];
   start: string; // ISO
-  end: string; // ISO
+  end: string;   // ISO
   maxUsesPerUser?: number;
 }
 
@@ -790,42 +520,13 @@ export interface OrderEvent {
 }
 
 export const ORDER_EVENTS: OrderEvent[] = [
-  {
-    id: "e1",
-    orderId: "ord_1234",
-    type: "placed",
-    ts: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
-    note: "Order received",
-  },
-  {
-    id: "e2",
-    orderId: "ord_1234",
-    type: "confirmed",
-    ts: new Date(Date.now() - 1000 * 60 * 60 * 22).toISOString(),
-    note: "Payment captured",
-  },
-  {
-    id: "e3",
-    orderId: "ord_1234",
-    type: "packed",
-    ts: new Date(Date.now() - 1000 * 60 * 60 * 18).toISOString(),
-    note: "Warehouse packed",
-  },
-  {
-    id: "e4",
-    orderId: "ord_1234",
-    type: "shipped",
-    ts: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString(),
-    note: "Handed to courier",
-    meta: { carrier: "Delhivery", awb: "DLV123456789" },
-  },
+  { id: "e1", orderId: "ord_1234", type: "placed", ts: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), note: "Order received" },
+  { id: "e2", orderId: "ord_1234", type: "confirmed", ts: new Date(Date.now() - 1000 * 60 * 60 * 22).toISOString(), note: "Payment captured" },
+  { id: "e3", orderId: "ord_1234", type: "packed", ts: new Date(Date.now() - 1000 * 60 * 60 * 18).toISOString(), note: "Warehouse packed" },
+  { id: "e4", orderId: "ord_1234", type: "shipped", ts: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString(), note: "Handed to courier", meta: { carrier: "Delhivery", awb: "DLV123456789" } },
 ];
 
-export type ShipmentStatus =
-  | "label_created"
-  | "in_transit"
-  | "out_for_delivery"
-  | "delivered";
+export type ShipmentStatus = "label_created" | "in_transit" | "out_for_delivery" | "delivered";
 
 export interface ShipmentEvent {
   ts: string;
@@ -851,16 +552,8 @@ export const SHIPMENTS: Shipment[] = [
     awb: "DLV123456789",
     status: "in_transit",
     events: [
-      {
-        ts: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString(),
-        status: "label_created",
-        location: "Delhi HUB",
-      },
-      {
-        ts: new Date(Date.now() - 1000 * 60 * 60 * 8).toISOString(),
-        status: "in_transit",
-        location: "Delhi ⇢ Noida",
-      },
+      { ts: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString(), status: "label_created", location: "Delhi HUB" },
+      { ts: new Date(Date.now() - 1000 * 60 * 60 * 8).toISOString(), status: "in_transit", location: "Delhi ⇢ Noida" },
     ],
   },
 ];
